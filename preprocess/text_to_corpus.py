@@ -44,7 +44,7 @@ def process_all_files(original_dir, output_dir):
     """ 
     Process all files in the directory and its subdirectories. 
     """
-    if output_dir == None:
+    if  not os.path.exists(output_dir):
         os.mkdir("data/")
     for root, dirs, files in os.walk(original_dir):
         for file in files:
