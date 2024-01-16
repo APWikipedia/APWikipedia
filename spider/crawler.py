@@ -39,7 +39,6 @@ def load_indexs_from_cache():
                 set, {category: set(articles) for category, articles in cache.items()}
             )
 
-
 def write_article(category, title):
     page = wiki_wiki.page(title)
     if page.exists():
@@ -47,10 +46,30 @@ def write_article(category, title):
         if not os.path.exists(dir):
             os.makedirs(dir)
 
+        # 提取文章内容
         name = page.title
-        path = os.path.join(dir, name)
-        with open(path, "w", encoding="utf-8") as file:
+        article_path = os.path.join(dir, f"{name}.txt")
+        with open(article_path, "w", encoding="utf-8") as file:
             file.write(page.text)
+
+        # 提取并保存外部链接
+        external_links_path = os.path.join(dir, f"{name}_external_links.txt")
+        write_external_links(page, external_links_path)
+
+        # 提取并保存反向链接
+        backlinks_path = os.path.join(dir, f"{name}_backlinks.txt")
+        write_backlinks(page, backlinks_path)
+
+
+def write_external_links(page, path):
+    with open(path, "w", encoding="utf-8") as file:
+        for link_page in page.links.values():
+            file.write(link_page.fullurl + "\n")
+                
+def write_backlinks(page, path):
+    with open(path, "w", encoding="utf-8") as file:
+        for link_page in page.backlinks.values():
+            file.write(link_page.fullurl + "\n")
 
 
 def get_related_categories(category, level=0, max_level=1):
