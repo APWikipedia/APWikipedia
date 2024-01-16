@@ -2,7 +2,7 @@ import json
 import os
 from collections import defaultdict
 
-DATA_ROOT = "../data/"
+DATA_ROOT = "data/"
 CACHE_FILE = "articles_index.json"
 CACHE_PATH = os.path.join(DATA_ROOT, CACHE_FILE)
 

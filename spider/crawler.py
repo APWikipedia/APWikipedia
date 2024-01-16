@@ -6,7 +6,7 @@ import wikipediaapi
 
 from cache import CACHE_PATH, check_cache, update_cache
 
-DATA_ROOT = "../data/"
+DATA_ROOT = "data/"
 if not os.path.exists(DATA_ROOT):
     os.makedirs(DATA_ROOT)
 
