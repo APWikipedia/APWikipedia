@@ -175,3 +175,5 @@ pyrightconfig.json
 
 # Customized settings
 data/
+apicache-py3/
+throttle.ctrl

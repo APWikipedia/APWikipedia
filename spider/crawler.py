@@ -2,13 +2,16 @@ import json
 import os
 from collections import defaultdict
 
+import pywikibot
 import wikipediaapi
-
-from cache import CACHE_PATH, check_cache, update_cache
+from cache import CACHE_PATH, cache_outdated, update_cache
+from pywikibot import Page
 
 DATA_ROOT = "data/"
 if not os.path.exists(DATA_ROOT):
     os.makedirs(DATA_ROOT)
+
+wikibot = pywikibot.Site("en", "wikipedia")
 
 wiki_wiki = wikipediaapi.Wikipedia(
     user_agent="Advanced personalized wikimedia (CW of UoE) (Yongtengrey@outlook.com)",
@@ -17,9 +20,10 @@ wiki_wiki = wikipediaapi.Wikipedia(
 )
 
 categories = set(
-    ["Machine learning", "Deep learning", "Internet search engines", "Data science"]
+    # ["Machine learning", "Deep learning", "Internet search engines", "Data science"]
+    ["Machine learning"]
 )
-# category:articles
+# K:V -> category:(articles, revision_id)
 articles = defaultdict(set)
 
 
@@ -39,37 +43,66 @@ def load_indexs_from_cache():
                 set, {category: set(articles) for category, articles in cache.items()}
             )
 
+
 def write_article(category, title):
+    """
+    Write article information:
+        latest revision id
+        URL
+        External links (out->)
+        Backlinks (in<-)
+        content
+    """
     page = wiki_wiki.page(title)
     if page.exists():
         dir = os.path.join(DATA_ROOT, category)
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-        # 提取文章内容
+        lastest_revision_id = str(get_revision_id(title))
+        # TODO: Delete
+        if not lastest_revision_id:
+            print(f"{title}: Revision id NOT FOUND")
+
+        # URL: can be None, even page.exists() is pass
+        url = page.fullurl if page.fullurl else ""
+        # TODO: Delete
+        if not url:
+            print(f"{title}:Url NOT FOUND")
+
+        # External links (out) PERF: Time consuming...
+        external_links = format_external_links(page)
+
+        # Back links (in) PERF: Time consuming...
+        backlinks = format_backlinks(page)
+
+        # Content
         name = page.title
         article_path = os.path.join(dir, f"{name}.txt")
         with open(article_path, "w", encoding="utf-8") as file:
+            file.write(lastest_revision_id + "\n")
+            file.write(url + "\n")
+            file.write(external_links + "\n")
+            file.write(backlinks + "\n")
             file.write(page.text)
-
-        # 提取并保存外部链接
-        external_links_path = os.path.join(dir, f"{name}_external_links.txt")
-        write_external_links(page, external_links_path)
-
-        # 提取并保存反向链接
-        backlinks_path = os.path.join(dir, f"{name}_backlinks.txt")
-        write_backlinks(page, backlinks_path)
+        return lastest_revision_id
+    return -1
 
 
-def write_external_links(page, path):
-    with open(path, "w", encoding="utf-8") as file:
-        for link_page in page.links.values():
-            file.write(link_page.fullurl + "\n")
-                
-def write_backlinks(page, path):
-    with open(path, "w", encoding="utf-8") as file:
-        for link_page in page.backlinks.values():
-            file.write(link_page.fullurl + "\n")
+def format_external_links(page):
+    return "|".join(
+        link_page.fullurl if link_page.fullurl else ""
+        for link_page in page.links.values()
+        if link_page.exists()
+    )
+
+
+def format_backlinks(page):
+    return "|".join(
+        link_page.fullurl if link_page.fullurl else ""
+        for link_page in page.backlinks.values()
+        if link_page.exists()
+    )
 
 
 def get_related_categories(category, level=0, max_level=1):
@@ -97,19 +130,28 @@ def get_category_articles(category):
     if not cat.exists():
         return
 
+    cached_articles = [article for article, _ in articles.get(category, set())]
+
     pages = cat.categorymembers
     for c in pages.values():
-        if (c.ns == wikipediaapi.Namespace.MAIN) and (
-            c.title not in articles[category]
-        ):
+        if (c.ns == wikipediaapi.Namespace.MAIN) and (c.title not in cached_articles):
             try:
-                articles[category].add(c.title)
-                write_article(category, c.title)
+                last_revision_id = write_article(category, c.title)
+                articles[category].add((c.title, last_revision_id))
                 print(f"Added {category}:{c.title}")
             except Exception as e:
                 print(f"Error processing article {category}:{c.title}: {e}")
         elif c.title in articles[category]:
             print(f"Escaped {category}:{c.title}")
+
+
+# PERF: Cost lot of time to check...
+def get_revision_id(title):
+    """
+    Get the latest_revision_id
+    """
+    page = Page(wikibot, title)
+    return page.latest_revision_id
 
 
 if __name__ == "__main__":
@@ -127,6 +169,6 @@ if __name__ == "__main__":
     for category in categories:
         get_category_articles(category)
 
-    if check_cache(cached_articles, articles):
+    if cache_outdated(cached_articles, articles):
         update_cache()
         print("updated cache")
