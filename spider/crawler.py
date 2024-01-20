@@ -1,10 +1,14 @@
+import argparse
 import json
 import os
+import sys
 from collections import defaultdict
+from pprint import pprint
 
 import pywikibot
 import wikipediaapi
 from cache import CACHE_PATH, cache_outdated, update_cache
+from parserx import setup_args
 from pywikibot import Page
 
 DATA_ROOT = "data/"
@@ -155,15 +159,26 @@ def get_revision_id(title):
 
 
 if __name__ == "__main__":
+    """Example usage:
+    python crawler.py \
+        --debug True \
+    """
+    parser = argparse.ArgumentParser()
+    setup_args(parser)
+    args = parser.parse_args(sys.argv[1:])
+
+    pprint(f"Parsed Arguments: {vars(args)}")
+
     # Load indexes
     cached_articles = load_indexs_from_cache()
     articles = cached_articles.copy()
 
     # Automatically explore related categories
-    for category in categories.copy():
-        get_related_categories(category)
+    if not args.debug:
+        for category in categories.copy():
+            get_related_categories(category)
 
-    print(f"{categories:}")
+        print(f"{categories:}")
 
     # Collect articles from category
     for category in categories:
