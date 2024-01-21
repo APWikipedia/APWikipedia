@@ -48,14 +48,14 @@ def load_indexs_from_cache():
             )
 
 
-def write_article(category, title):
+def write_article(category, title, fetch_links):
     """
-    Write article information:
-        latest revision id
-        URL
-        External links (out->)
-        Backlinks (in<-)
-        content
+    Write article information in JSON format:
+        - latest revision id
+        - URL
+        - External links
+        - Backlinks
+        - content
     """
     page = wiki_wiki.page(title)
     if page.exists():
@@ -63,50 +63,36 @@ def write_article(category, title):
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-        lastest_revision_id = str(get_revision_id(title))
-        # TODO: Delete
-        if not lastest_revision_id:
-            print(f"{title}: Revision id NOT FOUND")
+        article_data = {
+            "lastest_revision_id": str(get_revision_id(title)),
+            "url": page.fullurl if page.fullurl else "",
+            "external_links": format_external_links(page) if fetch_links else [],
+            "backlinks": format_backlinks(page) if fetch_links else [],
+            "content": page.text
+        }
 
-        # URL: can be None, even page.exists() is pass
-        url = page.fullurl if page.fullurl else ""
-        # TODO: Delete
-        if not url:
-            print(f"{title}:Url NOT FOUND")
-
-        # External links (out) PERF: Time consuming...
-        external_links = format_external_links(page)
-
-        # Back links (in) PERF: Time consuming...
-        backlinks = format_backlinks(page)
-
-        # Content
         name = page.title
-        article_path = os.path.join(dir, f"{name}.txt")
+        file_extension = "json"
+        article_path = os.path.join(dir, f"{name}.{file_extension}")
         with open(article_path, "w", encoding="utf-8") as file:
-            file.write(lastest_revision_id + "\n")
-            file.write(url + "\n")
-            file.write(external_links + "\n")
-            file.write(backlinks + "\n")
-            file.write(page.text)
-        return lastest_revision_id
+            json.dump(article_data, file, ensure_ascii=False, indent=4)
+        return article_data["lastest_revision_id"]
     return -1
 
 
 def format_external_links(page):
-    return "|".join(
-        link_page.fullurl if link_page.fullurl else ""
+    return [
+        link_page.fullurl
         for link_page in page.links.values()
-        if link_page.exists()
-    )
-
+        if link_page.exists() and link_page.fullurl
+    ]
 
 def format_backlinks(page):
-    return "|".join(
-        link_page.fullurl if link_page.fullurl else ""
+    return [
+        link_page.fullurl
         for link_page in page.backlinks.values()
-        if link_page.exists()
-    )
+        if link_page.exists() and link_page.fullurl
+    ]
 
 
 def get_related_categories(category, level=0, max_level=1):
@@ -129,7 +115,7 @@ def get_related_categories(category, level=0, max_level=1):
             get_related_categories(new_category, level=level + 1, max_level=max_level)
 
 
-def get_category_articles(category):
+def get_category_articles(category, fetch_links=False):
     cat = wiki_wiki.page("Category:" + category)
     if not cat.exists():
         return
@@ -140,7 +126,7 @@ def get_category_articles(category):
     for c in pages.values():
         if (c.ns == wikipediaapi.Namespace.MAIN) and (c.title not in cached_articles):
             try:
-                last_revision_id = write_article(category, c.title)
+                last_revision_id = write_article(category, c.title, fetch_links=fetch_links)
                 articles[category].add((c.title, last_revision_id))
                 print(f"Added {category}:{c.title}")
             except Exception as e:
@@ -182,7 +168,7 @@ if __name__ == "__main__":
 
     # Collect articles from category
     for category in categories:
-        get_category_articles(category)
+        get_category_articles(category, fetch_links=args.fetch_links)
 
     if cache_outdated(cached_articles, articles):
         update_cache()
