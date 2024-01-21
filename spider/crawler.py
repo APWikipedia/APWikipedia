@@ -14,7 +14,7 @@ from pywikibot import Page
 DATA_ROOT = "data/"
 if not os.path.exists(DATA_ROOT):
     os.makedirs(DATA_ROOT)
-
+    
 wikibot = pywikibot.Site("en", "wikipedia")
 
 wiki_wiki = wikipediaapi.Wikipedia(
@@ -143,6 +143,11 @@ def get_revision_id(title):
     page = Page(wikibot, title)
     return page.latest_revision_id
 
+def count_files_in_directory(directory):
+    total_files = 0
+    for root, dirs, files in os.walk(directory):
+        total_files += len(files)
+    return total_files
 
 if __name__ == "__main__":
     """Example usage:
@@ -154,7 +159,7 @@ if __name__ == "__main__":
     args = parser.parse_args(sys.argv[1:])
 
     pprint(f"Parsed Arguments: {vars(args)}")
-
+    
     # Load indexes
     cached_articles = load_indexs_from_cache()
     articles = cached_articles.copy()
@@ -173,3 +178,6 @@ if __name__ == "__main__":
     if cache_outdated(cached_articles, articles):
         update_cache()
         print("updated cache")
+
+    file_count = count_files_in_directory(DATA_ROOT)
+    print(f"Totally {file_count} files have been stored.")
