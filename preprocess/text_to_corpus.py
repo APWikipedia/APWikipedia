@@ -19,37 +19,40 @@ def split_into_sentences(text):
 
 def process_file(file_path, output_dir, original_dir):
     """ 
-    Process a single file and save as a TXT file with each sentence on a new line. 
+    Process a single file and save as a JSON file with each sentence on a new line. 
     """
     with open(file_path, 'r', encoding='utf-8') as file:
-        text = file.read()
+        data = json.load(file)
+        if 'content' in data:
+            text = data['content']
 
-    cleaned_text = clean_text(text)
-    sentences = split_into_sentences(cleaned_text)
+            cleaned_text = clean_text(text)
+            sentences = split_into_sentences(cleaned_text)
 
-    # Construct the output path
-    rel_path = os.path.relpath(file_path, start=original_dir)
-    txt_path = os.path.splitext(rel_path)[0] + '.txt'
-    output_path = os.path.join(output_dir, txt_path)
+            # We can change it into Array whether necessary
+            data['content'] = ' '.join(sentences)
 
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            rel_path = os.path.relpath(file_path, start=original_dir)
+            json_path = os.path.splitext(rel_path)[0] + '.json'
+            output_path = os.path.join(output_dir, json_path)
 
-    # Save each sentence on a new line in the TXT file
-    with open(output_path, 'w', encoding='utf-8') as output_file:
-        for sentence in sentences:
-            output_file.write(sentence + '\n')
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+            with open(output_path, 'w', encoding='utf-8') as output_file:
+                json.dump(data, output_file, ensure_ascii=False, indent=4)
 
 
 def process_all_files(original_dir, output_dir):
     """ 
     Process all files in the directory and its subdirectories. 
     """
-    if  not os.path.exists(output_dir):
-        os.mkdir("data/")
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
     for root, dirs, files in os.walk(original_dir):
         for file in files:
-            file_path = os.path.join(root, file)
-            process_file(file_path, output_dir, original_dir)
+            if file.endswith('.json'):
+                file_path = os.path.join(root, file)
+                process_file(file_path, output_dir, original_dir)
 
 input_dir = '../spider/data/'
 output_dir = 'data/'
