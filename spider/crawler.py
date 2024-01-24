@@ -4,12 +4,19 @@ import os
 import sys
 from collections import defaultdict
 from pprint import pprint
+import logging
 
 import pywikibot
 import wikipediaapi
 from cache import CACHE_PATH, cache_outdated, update_cache
 from parserx import setup_args
 from pywikibot import Page
+
+from logging.config import fileConfig
+
+fileConfig('../logging_config.ini')
+logger = logging.getLogger()
+logger.debug('All pass, all distinction, all 100')
 
 DATA_ROOT = "data/"
 if not os.path.exists(DATA_ROOT):
@@ -24,8 +31,52 @@ wiki_wiki = wikipediaapi.Wikipedia(
 )
 
 categories = set(
-    # ["Machine learning", "Deep learning", "Internet search engines", "Data science"]
-    ["Machine learning"]
+    ["Machine learning", "Deep learning", "Internet search engines", "Data science",
+    "Computer Vision","Natural Language Processing","Big Data","Cloud Computing",
+    "Internet of Things","Software Engineering","Computer Networks","Cybersecurity",
+    "Mobile App Development","Operating Systems","Programming Languages", 
+    "Algorithms","Database Technologies","Distributed Systems",
+    # 以上词条能爬取4922篇，耗时一小时
+    # 新增类别，谁来爬一下，挂几小时机
+    "Artificial Intelligence", "Human-Computer Interaction", "Quantum Computing",
+    "Virtual Reality", "Augmented Reality", "Blockchain", "Cryptocurrency",
+    "Digital Signal Processing", "Game Development", "Web Development",
+    "Computer Graphics", "User Experience Design", "Network Security",
+    "Parallel Computing", "Embedded Systems", "Computer Architecture",
+    "Information Retrieval", "E-Commerce Technology", "Computational Biology",
+    "Computational Physics", "Mathematical Software", "Ethical Hacking",
+    "Robotics", "Automation", "Digital Marketing", "Social Media Technology",
+    "Cloud Security", "Data Mining", "Machine Ethics", "Bioinformatics",
+    "Computer-Aided Design", "Computer Animation", "Wireless Networks",
+    "Wearable Technology", "5G Technology", "Edge Computing", "Fintech",
+    "Smart Cities", "Digital Art", "Information Theory", "Acoustic Engineering",
+    "Software Testing", "DevOps", "Agile Software Development", "System Administration",
+    "Data Visualization", "Graph Theory", "Information Systems", "IT Management",
+    "Quantum Information Science", "Computational Chemistry", "Digital Humanities",
+    "Technology Ethics", "Digital Privacy", "Cyber Physical Systems", "Information Economics",
+    "Ubiquitous Computing", "Human-Robot Interaction", "Computational Finance",
+    "Digital Forensics", "Autonomous Vehicles", "Cognitive Computing", "Applied Mathematics",
+    "Data Ethics", "Sustainable Computing", "Green IT", "Computational Sociology",
+    "Technology Management", "Educational Technology", "Health Informatics",
+    "Neural Networks", "Evolutionary Computation", "High Performance Computing",
+    "Open Source Software", "Software Metrics", "Network Management",
+    "Digital Libraries", "Technology Policy", "Digital Accessibility",
+    "Computational Geometry", "Pattern Recognition", "Computer Music",
+    "Multimedia Systems", "Speech Processing", "Sensor Networks", "Haptic Technology",
+    "Real-Time Systems", "Computer Forensics", "IT Legislation", "IT Project Management",
+    "Computational Astrophysics", "Cyber Warfare", "Human-Centered Computing",
+    "Cryptography", "Data Storage Systems", "Computer Ethics", "Cloud Storage",
+    "Enterprise Software", "Graphical User Interfaces", "Digital Signal Processors",
+    "Mobile Networking", "Ad Hoc Networks", "Microprocessor Design", "VLSI Design",
+    "Wearable Computing", "Computer Simulation", "Digital Signal Controllers",
+    "Microcontrollers", "Optical Computing", "Quantum Cryptography",
+    "Computer-Aided Engineering", "Computer-Aided Manufacturing", "Virtual Machines",
+    "Computer Performance", "Distributed Database", "IT Service Management",
+    "Multimedia Networking", "Network Security Algorithms", "Parallel Programming",
+    "Programmable Logic", "Reconfigurable Computing", "RFID Technology",
+    "Software Quality Assurance", "Speech Recognition Technology", "System On Chip",
+    "Virtual Reality Gaming", "Web Engineering", "Wireless Sensor Networks"]
+    # ["Machine learning"]
 )
 # K:V -> category:(articles, revision_id)
 articles = defaultdict(set)
@@ -36,7 +87,7 @@ def load_indexs_from_cache():
         with open(CACHE_PATH, "r", encoding="utf-8") as f:
             cache = json.load(f)
             return defaultdict(
-                set, {category: set(articles) for category, articles in cache.items()}
+                set, {category: {tuple(article) for article in articles} for category, articles in cache.items()}
             )
     except (FileNotFoundError, json.JSONDecodeError):
         # If cache file doesn't exist or is corrupted, update cache
@@ -44,7 +95,7 @@ def load_indexs_from_cache():
         with open(CACHE_PATH, "r", encoding="utf-8") as f:
             cache = json.load(f)
             return defaultdict(
-                set, {category: set(articles) for category, articles in cache.items()}
+                set, {category: {tuple(article) for article in articles} for category, articles in cache.items()}
             )
 
 
