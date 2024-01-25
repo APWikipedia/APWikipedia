@@ -1,30 +1,126 @@
-import re
+categories = sorted(list(set(
+    [
+    "Machine learning", "Deep learning", "Internet search engines", "Data science",
+    "Computer Vision","Natural Language Processing","Big Data","Cloud Computing",
+    "Internet of Things","Software Engineering","Computer Networks","Cybersecurity",
+    "Mobile App Development","Operating Systems","Programming Languages", 
+    "Algorithms","Database Technologies","Distributed Systems",
+    # # 以上词条能爬取4922篇，耗时一小时
+    # # 新增类别，谁来爬一下，挂几小时机
 
-import re
+    #  # 每人18行先 雷
+    "Artificial Intelligence", "Human-Computer Interaction", "Quantum Computing",
+    "Virtual Reality", "Augmented Reality", "Blockchain", "Cryptocurrency",
+    "Digital Signal Processing", "Game Development", "Web Development",
+    "Computer Graphics", "User Experience Design", "Network Security",
+    "Parallel Computing", "Embedded Systems", "Computer Architecture",
+    "Information Retrieval", "E-Commerce Technology", "Computational Biology",
+    "Computational Physics", "Mathematical Software", "Ethical Hacking",
+    "Robotics", "Automation", "Digital Marketing", "Social Media Technology",
+    "Cloud Security", "Data Mining", "Machine Ethics", "Bioinformatics",
+    "Computer-Aided Design", "Computer Animation", "Wireless Networks",
+    "Wearable Technology", "5G Technology", "Edge Computing", "Fintech",
+    "Smart Cities", "Digital Art", "Information Theory", "Acoustic Engineering",
+    "Software Testing", "DevOps", "Agile Software Development", "System Administration",
+    "Data Visualization", "Graph Theory", "Information Systems", "IT Management",
+    "Quantum Information Science", "Computational Chemistry", "Digital Humanities",
+    "Technology Ethics", "Digital Privacy", "Cyber Physical Systems", "Information Economics",
+    "Ubiquitous Computing", "Human-Robot Interaction", "Computational Finance",
+    "Digital Forensics", "Autonomous Vehicles", "Cognitive Computing", "Applied Mathematics",
+    # 沈
+    "Data Ethics", "Sustainable Computing", "Green IT", "Computational Sociology",
+    "Technology Management", "Educational Technology", "Health Informatics",
+    "Neural Networks", "Evolutionary Computation", "High Performance Computing",
+    "Open Source Software", "Software Metrics", "Network Management",
+    "Digital Libraries", "Technology Policy", "Digital Accessibility",
+    "Computational Geometry", "Pattern Recognition", "Computer Music",
+    "Multimedia Systems", "Speech Processing", "Sensor Networks", "Haptic Technology",
+    "Real-Time Systems", "Computer Forensics", "IT Legislation", "IT Project Management",
+    "Computational Astrophysics", "Cyber Warfare", "Human-Centered Computing",
+    "Cryptography", "Data Storage Systems", "Computer Ethics", "Cloud Storage",
+    "Enterprise Software", "Graphical User Interfaces", "Digital Signal Processors",
+    "Mobile Networking", "Ad Hoc Networks", "Microprocessor Design", "VLSI Design",
+    "Wearable Computing", "Computer Simulation", "Digital Signal Controllers",
+    "Microcontrollers", "Optical Computing", "Quantum Cryptography",
+    "Computer-Aided Engineering", "Computer-Aided Manufacturing", "Virtual Machines",
+    "Computer Performance", "Distributed Database", "IT Service Management",
+    "Multimedia Networking", "Network Security Algorithms", "Parallel Programming",
+    "Programmable Logic", "Reconfigurable Computing", "RFID Technology",
+    # # 姜
+    "Software Quality Assurance", "Speech Recognition Technology", "System On Chip",
+    "Virtual Reality Gaming", "Web Engineering", "Wireless Sensor Networks",
+    "Computer Security Incident Management", "Data Privacy Laws", "Edge Computing Architectures",
+    "Fuzzy Logic Systems", "Genetic Algorithms", "Hardware Security Modules",
+    "Information Theory in Cryptography", "IoT Security Protocols", "Machine Learning in Bioinformatics",
+    "Neural Network Optimization", "Quantum Machine Learning", "Reinforcement Learning Applications",
+    "Social Network Analysis Algorithms", "Software Defined Networking", "Virtualization Security",
+    "Web Scraping Techniques", "3D Computer Graphics", "Advanced Database Systems",
+    "Augmented Reality Development", "Biometric Authentication Technologies",
+    "Cloud Computing Security", "Computer Animation Techniques", "Data Compression Algorithms",
+    "Digital Currency Technologies", "Electronic Voting Systems", "Forensic Data Analysis",
+    "GPU Programming", "High-Throughput Computing", "IT Compliance and Ethics",
+    "Knowledge Representation and Reasoning", "Low-Power Computing", "Mobile Payment Systems",
+    "Network Function Virtualization", "Open Source Intelligence Techniques", "Predictive Analytics Models",
+    "Quantum Communication Networks", "Remote Sensing Technology", "Smart Grid Cybersecurity",
+    "Text Mining Algorithms", "Ubiquitous Networking", "Virtual Private Networks",
+    "Web Accessibility Standards", "Zigbee Communication Protocols", "Adaptive Learning Systems",
+    "Biologically Inspired Computing", "Computational Aerodynamics", "Data Fusion Techniques",
+    # 唐
+    "Embedded Software Development", "Gesture Recognition Systems", "Homomorphic Encryption Methods",
+    "Indoor Positioning Systems", "Location-Based Services", "Mobile Device Forensics",
+    "Neuromorphic Computing", "Optical Character Recognition", "Program Synthesis",
+    "Quantum Information Processing", "Robotics Control Systems", "Space Computing Technology",
+    "Threat Intelligence Platforms", "User Interface Design Principles", "Voice Recognition Technologies",
+    "Wearable Device Technologies", "3D Printing Technologies", "Automated Reasoning Systems",
+    "Blockchain in Healthcare", "Computational Fluid Dynamics", "Data Warehousing Solutions",
+    "Enterprise Resource Planning", "Game Theory in Computer Science", "Hybrid Cloud Solutions",
+    "Integrated Development Environments", "Log File Analysis Techniques", "Multimedia Learning Systems",
+    "Non-Fungible Token Technologies", "Operating System Development", "Privacy Enhancing Technologies",
+    "Radio Frequency Identification", "Semantic Web Technologies", "Supply Chain Management Software",
+    "Time Series Analysis in Finance", "User Generated Content Moderation", "Virtual Reality in Medicine",
+    "Wireless Communication Standards", "Zero Trust Network Architectures",
 
-def clean_text_optimized(text):
-        # 去除换行符
-    text = re.sub(r'\n+', ' ', text)
-    # 去除LaTeX数学环境
-    text = re.sub(r'\\begin\{.*?\}.*?\\end\{.*?\}', ' ', text, flags=re.DOTALL)
-    # 去除独立的LaTeX命令
-    text = re.sub(r'\\[a-zA-Z]+', ' ', text)
-    # 去除未闭合的LaTeX公式部分
-    text = re.sub(r'\$.+?\$', ' ', text)
-    text = re.sub(r'\{.*?\}', ' ', text)
-    
-    # 去除特定的特殊符号（+ = } 等）
-    text = re.sub(r'[+=^{}_()\[\]]', ' ', text)
-    # 去除被空格包围的单个字符（字母、数字、符号）
-    text = re.sub(r'\s[^\s]\s', ' ', text)
-    # 进一步去除因去除公式后留下的多余空格
-    text = re.sub(r'\s+', ' ', text)
-    return text.strip()
-
-
-# 示例文本
-example_text = " equation:\n\n  \n    \n      \n        \n          P\n          \n            r\n          \n        \n        =\n        \n          \n            \n              \n                P\n                \n                  t\n                \n              \n              \n                G\n                \n                  t\n                \n              \n              \n                G\n                \n                  r\n                \n              \n              \n                λ\n                \n                  2\n                \n              \n            \n            \n              (\n              4\n              π\n              \n                )\n                \n                  2\n                \n              \n              \n                d\n                \n                  2\n                \n              \n            \n          \n        \n      \n    \n    {\\displaystyle P_{r}={\\frac {P_{t}G_{t}G_{r}\\lambda ^{2}}{(4\\pi )^{2}d^{2}}}}\n  \n\n  \n    \n      \n        \n          P\n          \n            t\n          \n        \n      \n    \n    {\\displaystyle P_{t}}\n   is the power fed into the transmitting antenna input terminals;\n\n  \n    \n      \n        \n          P\n          \n            r\n          \n        \n      \n    \n    {\\displaystyle P_{r}}\n   is the power available at receiving antenna output terminals;\n\n  \n    \n      \n        d\n      \n    \n    {\\displaystyle d}\n   is the distance between antennas;\n\n  \n    \n      \n        \n          G\n          \n            t\n          \n        \n      \n    \n    {\\displaystyle G_{t}}\n   is transmitting antenna gain;\n\n  \n    \n      \n        \n          G\n          \n            r\n          \n        \n      \n    \n    {\\displaystyle G_{r}}\n   is receiving antenna gain;\n\n  \n    \n      \n        λ\n      \n    \n    {\\displaystyle \\lambda }\n   is the wavelength of the radio frequencyIf we consider the reflected signal, the new equation is:\n\n  \n    \n      \n        \n          P\n          \n            r\n          \n        \n        =\n        \n          \n            \n              \n                P\n                \n                  t\n                \n              \n              \n                G\n                \n                  t\n                \n              \n              \n                G\n                \n                  r\n                \n              \n              \n                λ\n                \n                  2\n                \n              \n            \n            \n              (\n              4\n              π\n              \n                )\n                \n                  2\n                \n              \n              (\n              d\n              +\n              4\n              h\n              \n                )\n                \n                  2\n                \n              \n            \n          \n        \n      \n    \n    {\\displaystyle P_{r}={\\frac {P_{t}G_{t}G_{r}\\lambda ^{2}}{(4\\pi )^{2}(d+4h)^{2}}}}\n  \n\n  \n    \n      \n        h\n      \n    \n    {\\displaystyle h}\n   is the distance between reflection points and direct path.When human shows up, we have a new transmission path. Therefore, the final equation is:\n\n  \n    \n      \n        \n          P\n          \n            r\n          \n        \n        =\n        \n          \n            \n              \n                P\n                \n                  t\n                \n              \n              \n                G\n                \n                  t\n                \n              \n              \n                G\n                \n                  r\n                \n              \n              \n                λ\n                \n                  2\n                \n              \n            \n            \n              (\n              4\n              π\n              \n                )\n                \n                  2\n                \n              \n              (\n              d\n              +\n              4\n              h\n              +\n              Δ\n              \n                )\n                \n                  2\n                \n              \n            \n          \n        \n      \n    \n    {\\displaystyle P_{r}={\\frac {P_{t}G_{t}G_{r}\\lambda ^{2}}{(4\\pi )^{2}(d+4h+\\Delta )^{2}}}}\n  \n  \n    \n      \n        Δ\n      \n    \n    {\\displaystyle \\Delta }\n   is the approximate difference of the path caused by human body.\n\nDynamic transmission model\nIn this model, we consider the human motion, which causes the signal transmission path to change continuously. We can use Doppler Shift to describe this effect, which is related to the motion speed.\n\n  \n    \n      \n        Δ\n        f\n        =\n        \n          \n            \n              2\n              v\n              cos\n              ⁡\n              θ\n            \n            c\n          \n        \n        f\n      \n    \n    {\\displaystyle \\Delta f={\\frac {2v\\cos \\theta }{c}}f}\n  By calculating the Doppler Shift of the receiving signal, we can figure out the pattern of the movement, thereby further identifying human activity. For example, in, the Doppler shift is used as a fingerprint to achieve high-precision identification for nine different movement patterns.\n\nFresnel zone\nThe Fresnel zone was initially used to study the interference and\ndiffraction of the light, which is later used to construct the wireless signal transmission model. Fresnel zone is a series of elliptical intervals whose foci are the positions of the sender and receiver.\nWhen a person is moving across different Fresnel zones, the signal path formed by the reflection of the human body changes, and if people move vertically through Fresnel zones, the change of signal will be periodical. In the paper, and, they have applied the Fresnel model to the activity recognition task and got a more accurate result.\n\nModeling of the human body\nIn some tasks, we should consider modeling the human body accurately to achieve better results. For example, described the human body as concentric cylinders for breath detection. The outside of the cylinder denotes the rib cage when people inhale, and the inside denotes that when people exhale. So the difference between the radius of that two cylinders represents the moving distance during breathing.  \nThe change of the signal phases can be expressed in the following equation:\n\n  \n    \n      \n        θ\n        =\n        2\n        π\n        \n          \n            \n              2\n              \n              Δ\n              d\n            \n            λ\n          \n        \n      \n    \n    {\\displaystyle \\theta =2\\pi {\\frac {2\\,\\Delta d}{\\lambda }}}\n  \n\n  \n    \n      \n        θ\n      \n    \n    {\\displaystyle \\theta }\n   is the change of the signal phases;\n\n  \n    \n      \n        λ\n      \n    \n    {\\displaystyle \\lambda }\n   is the wavelength of the radio frequency;\n\n  \n    \n      \n        Δ\n        d\n      \n    \n    {\\displaystyle \\Delta d}\n   is moving distance of rib cage;\n\nDatasets\nThere are some popular datasets that are used for benchmarking activity recognition or action recognition algorithms.\n\nUCF-101: It consists of 101 human action classes, over 13k clips and 27 hours of video data. Action classes include applying makeup, playing dhol, cricket shot, shaving beard, etc.\nHMDB51: This is a collection of realistic videos from various sources, including movies and web videos. The dataset is composed of 6,849 video clips from 51 action categories (such as “jump”, “kiss” and “laugh”), with each category containing at least 101 clips.\nKinetics: This is a significantly larger dataset than the previous ones. It contains 400 human action classes, with at least 400 video clips for each action. Each clip lasts around 10s and is taken from a different YouTube video. This dataset was created by DeepMind.\n\nApplications\nBy automatically monitoring human activities, home-based rehabilitation can be provided for people suffering from traumatic brain injuries. One can find applications ranging from security-related applications and logistics support to location-based services. Activity recognition systems have been developed for wildlife observation and energy conservation in buildings.\n\nSee also\nAI effect\nApplications of artificial intelligence\nConditional random field\nGesture recognition\nHidden Markov model\nMotion analysis\nNaive Bayes classifier\nSupport vector machines\nObject co-segmentation\nOutline of artificial intelligence\nVideo content analysis\n\n\n== References =="
-
-# 清理文本
-cleaned_text = clean_text_optimized(example_text)
-print(cleaned_text)
+    "Artificial Intelligence", "Blockchain", "Quantum Computing", "Robotics",
+    "Augmented Reality", "Virtual Reality", "Game Development", "Computer Hardware",
+    "Human-Computer Interaction", "Information Systems", "Network Security",
+    "Graph Theory", "Parallel Computing", "Cryptography", "Data Mining",
+    "Embedded Systems", "Computer Graphics", "Web Development", "E-Commerce",
+    "Digital Marketing", "Bioinformatics", "Computational Biology", "Cognitive Science",
+    "User Experience Design", "Wireless Networks", "Computer Animation", "Digital Art",
+    "Educational Technology", "Information Retrieval", "Software Testing",
+    "Software Metrics", "Software Modeling", "Agile Software Development",
+    "DevOps", "Data Visualization", "User Interface Design", "Systems Engineering",
+    "Real-Time Computing", "Digital Signal Processing", "Microprocessors",
+    "Quantum Information Science", "Data Structures", "Functional Programming",
+    "Object-Oriented Programming", "Logic Programming", "Concurrent Programming",
+    "Formal Methods", "Software Architecture", "Network Protocols", "Web Services",
+    "Cloud Security", "Machine Ethics", "Computational Linguistics", "Semantic Web",
+    "Digital Libraries", "Computer Aided Design", "IT Project Management",
+    "Network Management", "Systems Analysis", "Data Quality", "Computational Chemistry",
+    "Computational Physics", "Computer-Aided Engineering", "Knowledge Management",
+    "Social Network Analysis", "Mobile Computing", "Wearable Technology",
+    "Internet Governance", "Digital Privacy", "Cyber Warfare", "Information Ethics",
+    "Technology Management", "Information Theory", "Digital Currency", "FinTech",
+    "Health Informatics", "Geographic Information Systems", "Urban Informatics",
+    "Smart Cities", "Renewable Energy Technology", "Green IT", "Human-Robot Interaction",
+    "Autonomous Vehicles", "Quantum Cryptography", "Cloud Storage", "Edge Computing",
+    "Internet Protocol", "Software Licensing", "Open Source Software",
+    "Computer Forensics", "Data Recovery", "Computer Viruses", "Hacking",
+    "Digital Rights Management", "Information Assurance", "IT Governance",
+    "Enterprise Architecture", "Business Intelligence", "Customer Relationship Management",
+    "Supply Chain Management", "ERP Systems", "Decision Support Systems",
+    "E-Government", "Digital Transformation", "Technology Adoption",
+    "Innovation Management", "Technology Forecasting", "Computational Neuroscience",
+    "Computational Social Science", "Digital Humanities", "Media Technology",
+    "Audio Engineering", "Video Game Design", "Esports", "3D Printing",
+    "Internet Safety", "Technology Education", "Technology Policy", "Ethical Hacking",
+    "Penetration Testing", "Digital Forensics", "Information Security Management",
+    "Risk Management", "IT Compliance", "Network Architecture", "Wireless Security",
+    "Malware Analysis", "Computer Performance", "Systems Integration",
+    "Human Factors Engineering", "Quality Assurance", "IT Service Management",
+    "Change Management", "Technical Support", "IT Outsourcing", "Cloud Analytics",
+    "Data Center Management", "Virtualization Technology", "Storage Area Networks",
+    "Disaster Recovery", "Business Continuity Planning", "IT Auditing", "Cyber Risk Management",
+    "Cyber Physical Systems", "Internet Law", "Digital Policy", "Telecommunications Law"]
+)))
+print(categories)
