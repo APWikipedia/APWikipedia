@@ -38,6 +38,8 @@ categories = set(
     "Algorithms","Database Technologies","Distributed Systems",
     # 以上词条能爬取4922篇，耗时一小时
     # 新增类别，谁来爬一下，挂几小时机
+
+     # 每人18行先 雷
     "Artificial Intelligence", "Human-Computer Interaction", "Quantum Computing",
     "Virtual Reality", "Augmented Reality", "Blockchain", "Cryptocurrency",
     "Digital Signal Processing", "Game Development", "Web Development",
@@ -56,6 +58,7 @@ categories = set(
     "Technology Ethics", "Digital Privacy", "Cyber Physical Systems", "Information Economics",
     "Ubiquitous Computing", "Human-Robot Interaction", "Computational Finance",
     "Digital Forensics", "Autonomous Vehicles", "Cognitive Computing", "Applied Mathematics",
+    # 沈
     "Data Ethics", "Sustainable Computing", "Green IT", "Computational Sociology",
     "Technology Management", "Educational Technology", "Health Informatics",
     "Neural Networks", "Evolutionary Computation", "High Performance Computing",
@@ -74,6 +77,7 @@ categories = set(
     "Computer Performance", "Distributed Database", "IT Service Management",
     "Multimedia Networking", "Network Security Algorithms", "Parallel Programming",
     "Programmable Logic", "Reconfigurable Computing", "RFID Technology",
+    # 姜
     "Software Quality Assurance", "Speech Recognition Technology", "System On Chip",
     "Virtual Reality Gaming", "Web Engineering", "Wireless Sensor Networks",
     "Computer Security Incident Management", "Data Privacy Laws", "Edge Computing Architectures",
@@ -92,6 +96,7 @@ categories = set(
     "Text Mining Algorithms", "Ubiquitous Networking", "Virtual Private Networks",
     "Web Accessibility Standards", "Zigbee Communication Protocols", "Adaptive Learning Systems",
     "Biologically Inspired Computing", "Computational Aerodynamics", "Data Fusion Techniques",
+    # 唐
     "Embedded Software Development", "Gesture Recognition Systems", "Homomorphic Encryption Methods",
     "Indoor Positioning Systems", "Location-Based Services", "Mobile Device Forensics",
     "Neuromorphic Computing", "Optical Character Recognition", "Program Synthesis",
