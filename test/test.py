@@ -121,6 +121,13 @@ categories = sorted(list(set(
     "Change Management", "Technical Support", "IT Outsourcing", "Cloud Analytics",
     "Data Center Management", "Virtualization Technology", "Storage Area Networks",
     "Disaster Recovery", "Business Continuity Planning", "IT Auditing", "Cyber Risk Management",
-    "Cyber Physical Systems", "Internet Law", "Digital Policy", "Telecommunications Law"]
+    "Cyber Physical Systems", "Internet Law", "Digital Policy", "Telecommunications Law",
+    "Automation","Biotechnology","Cartography","Chemical engineering","Communication ","Media studies","Telecommunications","Construction",
+    "Control theory","Design","Digital divide","Earthquake engineering","Energy","Ergonomics","Firefighting","Fire prevention","Forensic science","Forestry","Industry","Information science","Internet","Management","Manufacturing","Marketing","Medicine","Unsolved problems in neuroscience","Metalworking","Microtechnology","Military science","Mining","Nanotechnology","Nuclear technology","Optics","Plumbing","Robotics","Sound technology","Technology forecasting","Tools",
+    "Computing","Apps","Artificial intelligence","Classes of computers","Companies","Computer architecture","Computer model","Computer engineering","Computer science","Computer security",
+    "Computing and society","Data","Embedded systems","Free software","Human-computer interaction","Information systems","Information technology","Internet","Mobile web","Languages","Multimedia","Networks (Industrial)","Operating systems","Platforms","Product lifecycle management","Programming","Real-time computing","Software","Software engineering","Unsolved problems in computer science",
+    "Electronics","Avionics","Circuits","Companies","Connectors","Consumer electronics","Digital electronics","Digital media","Electrical components","Electronic design","Electronics manufacturing","Embedded systems","Integrated circuits","Microwave technology","Molecular electronics","Water technology","Optoelectronics","Quantum electronics","Radio-frequency identification RFID","Radio electronics","Semiconductors","Signal cables","Surveillance","Telecommunications",
+    "Electrical engineering","Environmental engineering","Materials science","Mechanical engineering","Nuclear technology","Software engineering","Structural engineering","Systems engineering"
+    ]
 )))
 print(categories)
