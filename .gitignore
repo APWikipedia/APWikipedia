@@ -179,7 +179,8 @@ data/
 merged_data/
 apicache-py3/
 throttle.ctrl
-raw_data.csv
 merged_data/
 processed_data/
 inverted_index.json
+processed_data.csv
+*.joblib
