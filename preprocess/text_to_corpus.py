@@ -3,6 +3,7 @@ import os
 import re
 import string
 from typing import Dict, List, Set, Tuple
+from multiprocessing import Pool, cpu_count
 
 from nltk.stem import SnowballStemmer
 
@@ -45,32 +46,48 @@ class DataPreProcessor:
         tokens = [self.stemmer.stem(word) for word in filtered_text]
         return tokens
 
-    def process_files(self, input_dir, output_dir):
+    def process_file(self, file_path, output_dir):
+        """ 
+        Process a single merged JSON file.
         """
-        Process all merged JSON files in the directory.
-        """
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
+        with open(file_path, 'r', encoding='utf-8') as input_file:
+            data = json.load(input_file)
+            for item in data:
+                if 'content' in item and 'content' in item['content']:
+                    actual_content = item['content']['content']
+                    cleaned_text = self.clean_text(actual_content)
+                    tokens = self.tokenize(cleaned_text)
+                    item['content']['content'] = cleaned_text
+                    item['content']['token'] = tokens
 
-        for file in os.listdir(input_dir):
-            if file.endswith(".json"):
-                file_path = os.path.join(input_dir, file)
-                with open(file_path, "r", encoding="utf-8") as input_file:
-                    data = json.load(input_file)
-                    for item in data:
-                        if "content" in item and "content" in item["content"]:
-                            actual_content = item["content"]["content"]
-                            cleaned_text = self.clean_text(actual_content)
-                            tokens = self.tokenize(cleaned_text)
-                            item["content"]["content"] = cleaned_text
-                            item["content"]["token"] = tokens
+        output_file_path = os.path.join(output_dir, os.path.basename(file_path))
+        with open(output_file_path, 'w', encoding='utf-8') as output_file:
+            json.dump(data, output_file, ensure_ascii=False, indent=4)
+                    
+def process_file_wrapper(args):
+    """ 
+    Wrapper function for multiprocessing.
+    """
+    dataPreProcessor = DataPreProcessor()
+    dataPreProcessor.process_file(*args)
 
-                output_path = os.path.join(output_dir, file)
-                with open(output_path, "w", encoding="utf-8") as output_file:
-                    json.dump(data, output_file, ensure_ascii=False, indent=4)
+def process_files_in_parallel(input_dir, output_dir):
+    """ 
+    Process all merged JSON files in the directory in parallel.
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
 
+    files_to_process = [(os.path.join(input_dir, file), output_dir) 
+                        for file in os.listdir(input_dir) if file.endswith('.json')]
 
-input_dir = "../spider/merged_data/"
-output_dir = "./data/"
-dataPreProcessor = DataPreProcessor()
-dataPreProcessor.process_files(input_dir, output_dir)
+    pool = Pool(processes=cpu_count())
+    pool.map(process_file_wrapper, files_to_process)
+    pool.close()
+    pool.join()
+    
+if __name__ == '__main__':
+    input_dir = '../spider/merged_data/' 
+    output_dir = "./data/"
+    process_files_in_parallel(input_dir, output_dir)
+
