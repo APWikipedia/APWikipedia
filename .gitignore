@@ -182,3 +182,4 @@ throttle.ctrl
 raw_data.csv
 merged_data/
 processed_data/
+inverted_index.json

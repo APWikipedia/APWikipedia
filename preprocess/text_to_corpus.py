@@ -14,28 +14,28 @@ class DataPreProcessor:
     def __init__(self) -> None:
         self.stopwords = set(open(STOP_FILE_PATH, encoding="utf-8").read().splitlines())
         self.stemmer = self.stemmer = SnowballStemmer("english")
+        self.patterns = {
+            "newlines": re.compile(r"\n+"),
+            "latex_env": re.compile(r"\\begin\{.*?\}.*?\\end\{.*?\}", re.DOTALL),
+            "latex_cmd": re.compile(r"\\[a-zA-Z]+"),
+            "unbalanced_latex": re.compile(r"\$.+?\$"),
+            "curly_braces": re.compile(r"\{.*?\}"),
+            "special_chars": re.compile(r"[+=^{}_()\[\]]"),
+            "single_char": re.compile(r"\s[^\s]\s"),
+            "extra_spaces": re.compile(r"\s+")
+        }
 
     def clean_text(self, text):
-        """
-        Clean text
-        """
-        # 去除换行符
-        text = re.sub(r"\n+", " ", text)
-        # 去除LaTeX数学环境
-        text = re.sub(r"\\begin\{.*?\}.*?\\end\{.*?\}", " ", text, flags=re.DOTALL)
-        # 去除独立的LaTeX命令
-        text = re.sub(r"\\[a-zA-Z]+", " ", text)
-        # 去除未闭合的LaTeX公式部分
-        text = re.sub(r"\$.+?\$", " ", text)
-        text = re.sub(r"\{.*?\}", " ", text)
-
-        # 去除特定的特殊符号（+ = } 等）
-        text = re.sub(r"[+=^{}_()\[\]]", " ", text)
-        # 去除被空格包围的单个字符（字母、数字、符号）
-        text = re.sub(r"\s[^\s]\s", " ", text)
-        # 进一步去除因去除公式后留下的多余空格
-        text = re.sub(r"\s+", " ", text)
-        return text.strip()
+        # 使用预编译的正则表达式
+        text = self.patterns["newlines"].sub(" ", text)
+        text = self.patterns["latex_env"].sub(" ", text)
+        text = self.patterns["latex_cmd"].sub(" ", text)
+        text = self.patterns["unbalanced_latex"].sub(" ", text)
+        text = self.patterns["curly_braces"].sub(" ", text)
+        text = self.patterns["special_chars"].sub(" ", text)
+        text = self.patterns["single_char"].sub(" ", text)
+        text = self.patterns["extra_spaces"].sub(" ", text)
+        return text.strip() 
 
     def tokenize(self, text):
         text = "".join(ch for ch in text if ch not in string.punctuation)
