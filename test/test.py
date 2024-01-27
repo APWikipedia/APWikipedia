@@ -130,4 +130,11 @@ categories = sorted(list(set(
     "Electrical engineering","Environmental engineering","Materials science","Mechanical engineering","Nuclear technology","Software engineering","Structural engineering","Systems engineering"
     ]
 )))
-print(categories)
+#print(categories)
+
+def preview_file(file_path, num_lines=10):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for _ in range(num_lines):
+            print(file.readline().strip())
+
+preview_file('engine/inverted_index.json', 100)  # 查看前5行
