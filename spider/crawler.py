@@ -13,7 +13,7 @@ from cache import CACHE_PATH, cache_outdated, update_cache
 from parserx import setup_args
 from pywikibot import Page
 
-fileConfig("../logging_config.ini")
+fileConfig("logging_config.ini")
 logger = logging.getLogger()
 logger.debug("All pass, all distinction, all 100")
 
