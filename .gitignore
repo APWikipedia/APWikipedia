@@ -179,3 +179,4 @@ data/
 merged_data/
 apicache-py3/
 throttle.ctrl
+raw_data.csv
