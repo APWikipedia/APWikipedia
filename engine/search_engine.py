@@ -1,6 +1,8 @@
 import json
+import math
 import re
-from typing import List, Set
+from typing import List, Set, Tuple
+
 from nltk.stem import PorterStemmer
 
 
@@ -13,6 +15,7 @@ class SearchEngine:
             .read()
             .splitlines()
         )
+
     @staticmethod
     def load_index(index_file: str) -> dict:
         with open(index_file, "r", encoding="utf-8") as file:
@@ -54,15 +57,16 @@ class SearchEngine:
         """
         Special search with both operators (AND, OR, NOT) and phrases
         """
+
         def extract_positions(phrase, words):
-        # Extract the position of a phrase or word
+            # Extract the position of a phrase or word
             if phrase:
                 pos = set(self.phrase_search(phrase))
             else:
                 pos = set()
 
             for word in words:
-                if word.upper() not in ['AND', 'OR', 'NOT']:
+                if word.upper() not in ["AND", "OR", "NOT"]:
                     stemmed_word = self.ps.stem(word.lower())
                     if stemmed_word in self.inverted_index:
                         pos = pos.union(set(self.inverted_index[stemmed_word].keys()))
@@ -70,29 +74,37 @@ class SearchEngine:
 
         result = set()
         phrases = re.findall(r'"(.*?)"', text)
-        other_words = re.sub(r'"(.*?)"', '', text).split()
+        other_words = re.sub(r'"(.*?)"', "", text).split()
 
         if phrases:
             pos1 = extract_positions(phrases[0], other_words)
-            pos2 = extract_positions(phrases[1] if len(phrases) > 1 else None, other_words)
+            pos2 = extract_positions(
+                phrases[1] if len(phrases) > 1 else None, other_words
+            )
 
-            if 'AND' in text:
-                result = pos1.intersection(pos2) if 'AND NOT' not in text else pos1 - pos2
-            elif 'OR' in text:
-                result = pos1.union(pos2) if 'OR NOT' not in text else pos1.union(set(self.index.keys()) - pos2)
+            if "AND" in text:
+                result = (
+                    pos1.intersection(pos2) if "AND NOT" not in text else pos1 - pos2
+                )
+            elif "OR" in text:
+                result = (
+                    pos1.union(pos2)
+                    if "OR NOT" not in text
+                    else pos1.union(set(self.index.keys()) - pos2)
+                )
 
         return result
 
     def phrase_search(self, phrase_tokens: List[str]) -> Set[int]:
-        '''
+        """
         Phase search
         Find all documents if they contain token from the phrase query statement
-        '''
+        """
         # phrase_tokens = self.query_preprocess(query)
         # print(f"Preprocessed tokens: {phrase_tokens}")
         if not phrase_tokens or phrase_tokens[0] not in self.inverted_index:
             return set()
-        
+
         docs = set(self.inverted_index[phrase_tokens[0]].keys())
         for token in phrase_tokens[1:]:
             if token not in self.inverted_index:
@@ -101,15 +113,16 @@ class SearchEngine:
 
         result_docs = []
         for doc in docs:
-            positions = [self.inverted_index[token][doc]
-                        for token in phrase_tokens]
+            positions = [self.inverted_index[token][doc] for token in phrase_tokens]
             for pos in positions[0]:
                 if all([(pos + i) in positions[i] for i in range(1, len(positions))]):
                     result_docs.append(doc)
                     break
         return set(result_docs)
 
-    def compute_positions_within_distance(self, positions1: List[int], positions2: List[int], distance: int) -> bool:
+    def compute_positions_within_distance(
+        self, positions1: List[int], positions2: List[int], distance: int
+    ) -> bool:
         """
         Check if any pair of positions between two lists are within a specified distance.
         """
@@ -124,11 +137,11 @@ class SearchEngine:
         return False
 
     def proximity_search(self, query: str) -> Set[int]:
-        '''
+        """
         Promimity search, only for query like this: #20(income, taxes)
-        '''
+        """
         # Match the terms and required distance
-        match = re.match(r'#(\d+)\((\w+),\s*(\w+)\)', query)
+        match = re.match(r"#(\d+)\((\w+),\s*(\w+)\)", query)
         if not match:
             return set()
 
@@ -146,15 +159,61 @@ class SearchEngine:
             if doc_id in self.inverted_index[token2]:
                 positions1 = self.inverted_index[token1][doc_id]
                 positions2 = self.inverted_index[token2][doc_id]
-                if self.compute_positions_within_distance(positions1, positions2, distance):
+                if self.compute_positions_within_distance(
+                    positions1, positions2, distance
+                ):
                     results.add(doc_id)
 
         return results
-        
+
+    def compute_idf(self) -> None:
+        """
+        Calculate the IDF value of each word according to the formula
+        """
+        self.idf = {}
+        N = len({doc_id for postings in self.inverted_index.values() for doc_id in postings})
+        for term, postings in self.inverted_index.items():
+            df = len(postings)
+            self.idf[term] = math.log10(N / df)
+
+    def compute_tf_idf(self) -> None:
+        """
+        Calculate the TFIDF value for each word in each document according to the formula
+        """
+        self.tf_idf = {}
+        for term, postings in self.inverted_index.items():
+            if term not in self.tf_idf:
+                self.tf_idf[term] = {}
+            for doc_id, positions in postings.items():
+                tf = len(positions)
+                self.tf_idf[term][doc_id] = (1 + math.log10(tf)) * self.idf[term]
+
+    def ranked_search(self, query: str) -> List[Tuple[int, float]]:
+        """
+        TFIDF search, use TF-IDF value to return ranked search result
+        """
+        self.compute_idf()
+        self.compute_tf_idf()
+        query_tokens = self.query_preprocess(query)
+
+        doc_scores = {}
+        for token in query_tokens:
+            if token in self.tf_idf:
+                for doc_id, weight in self.tf_idf[token].items():
+                    if doc_id not in doc_scores:
+                        doc_scores[doc_id] = 0
+                    doc_scores[doc_id] += weight
+        # Sort documents in descending order of TF-IDF score
+        ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
+        return ranked_docs[:150]  # Return first 150 documents
+
+
 if __name__ == "__main__":
     engine = SearchEngine("engine/inverted_index.json")
-    #query = "income taxes"
-    #query =  "#20(income, taxes)"
-    query = '"AI algorithm" OR bayes'
-    result = engine.execute_query(query)
+    # query = "income taxes"
+    # query =  "#20(income, taxes)"
+    # query = '"AI algorithm" OR bayes'
+    query = 'algorithm'
+    # result = engine.execute_query(query)
+    result  = engine.ranked_search(query)
     print(result)
