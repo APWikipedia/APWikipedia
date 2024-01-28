@@ -171,7 +171,9 @@ class SearchEngine:
         Calculate the IDF value of each word according to the formula
         """
         self.idf = {}
-        N = len({doc_id for postings in self.inverted_index.values() for doc_id in postings})
+        N = len(
+            {doc_id for postings in self.inverted_index.values() for doc_id in postings}
+        )
         for term, postings in self.inverted_index.items():
             df = len(postings)
             self.idf[term] = math.log10(N / df)
@@ -213,7 +215,7 @@ if __name__ == "__main__":
     # query = "income taxes"
     # query =  "#20(income, taxes)"
     # query = '"AI algorithm" OR bayes'
-    query = 'algorithm'
+    query = "algorithm"
     # result = engine.execute_query(query)
-    result  = engine.ranked_search(query)
+    result = engine.ranked_search(query)
     print(result)
