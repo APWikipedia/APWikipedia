@@ -184,4 +184,3 @@ processed_data/
 inverted_index.json
 processed_data.csv
 *.joblib
-.ps1
