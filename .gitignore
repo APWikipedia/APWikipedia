@@ -30,6 +30,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.zip
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -175,3 +176,11 @@ pyrightconfig.json
 
 # Customized settings
 data/
+merged_data/
+apicache-py3/
+throttle.ctrl
+merged_data/
+processed_data/
+inverted_index.json
+processed_data.csv
+*.joblib
