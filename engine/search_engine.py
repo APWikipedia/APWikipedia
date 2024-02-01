@@ -216,6 +216,6 @@ if __name__ == "__main__":
     # query =  "#20(income, taxes)"
     # query = '"AI algorithm" OR bayes'
     query = "algorithm"
-    # result = engine.execute_query(query)
-    result = engine.ranked_search(query)
+    result = engine.execute_query(query)
+    # result = engine.ranked_search(query)
     print(result)
