@@ -1,10 +1,11 @@
 import json
 import math
 import re
+import time
 from typing import List, Set, Tuple
 
 from nltk.stem import PorterStemmer
-
+import gzip
 
 class SearchEngine:
     def __init__(self, index_file: str) -> None:
@@ -16,9 +17,17 @@ class SearchEngine:
             .splitlines()
         )
 
+    # @staticmethod
+    # no zipped
+    # def load_index(index_file: str) -> dict:
+    #     with open(index_file, "r", encoding="utf-8") as file:
+    #         return json.load(file)
     @staticmethod
     def load_index(index_file: str) -> dict:
-        with open(index_file, "r", encoding="utf-8") as file:
+        """
+        Load the zipped inverted index from the file
+        """
+        with gzip.open(index_file, "rt", encoding="utf-8") as file:
             return json.load(file)
 
     def execute_query(self, query: str) -> Set[int]:
@@ -207,15 +216,21 @@ class SearchEngine:
                     doc_scores[doc_id] += weight
         # Sort documents in descending order of TF-IDF score
         ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-        return ranked_docs[:150]  # Return first 150 documents
+        return ranked_docs[:10]  # Return first 150 documents
 
 
 if __name__ == "__main__":
-    engine = SearchEngine("engine/inverted_index.json")
+    start_time = time.time()
+    engine = SearchEngine("engine/inverted_index_zipped.json")
+    #ngine = SearchEngine("engine/inverted_index.json")
+    load_time = time.time() - start_time
+    print(f"Load time: {load_time:.2f}s")
     # query = "income taxes"
     # query =  "#20(income, taxes)"
     # query = '"AI algorithm" OR bayes'
-    query = "algorithm"
-    result = engine.execute_query(query)
-    # result = engine.ranked_search(query)
+    query = "ai"
+    #result = engine.execute_query(query)
+    result = engine.ranked_search(query)
+    query_time = time.time() - load_time
+    print(f"Query time: {query_time:.2f}s")
     print(result)
