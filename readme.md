@@ -1,16 +1,17 @@
 # APWikipedia开发手册
 
 ## TODO
-**1. WebFrontEnd (Full functions) Yueshuang
-**2. WebBackEnd (optimize Storage and Speed) Yuhang
-**3. Tags, LM Yongteng
-**4. L2R TianYue
-**5. Host Online
+**1. WebFrontEnd (Full functions) Yueshuang**
+**2. WebBackEnd (optimize Storage and Speed) Yuhang**
+**3. Tags, LM Yongteng**
+**4. L2R TianYue**
+**5. Host Online**
 
 ## 预处理和查询
 
 **1. 首先merge原数据data**
-`python preprocess/merage_file.py`
+
+`python preprocess/merge_file.py`
 
 **2. 将merge_data进行preprocess转换成corpus**
 
