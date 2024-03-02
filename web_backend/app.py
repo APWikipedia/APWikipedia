@@ -1,5 +1,5 @@
 import sys
-#sys.path.insert(0, 'c:\\Users\\sheny\\Desktop\\TTDS\\cw3\\APWikipedia') # 在我的电脑上运行时出现了找不到web_backend和engine的问题，通过此方法解决
+sys.path.insert(0, 'c:\\Users\\96962\\Desktop\\TTDS\\APWikipedia') # 在我的电脑上运行时出现了找不到web_backend和engine的问题，通过此方法解决
 from flask import Flask, current_app
 from flask_restful import Api
 from flask_cors import CORS
