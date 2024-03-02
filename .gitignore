@@ -182,5 +182,6 @@ throttle.ctrl
 merged_data/
 processed_data/
 inverted_index.json
+inverted_index_zipped.json
 processed_data.csv
 *.joblib
