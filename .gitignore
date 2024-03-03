@@ -191,3 +191,4 @@ classifier/lada_model.gensim.id2word
 classifier/lada_model.gensim.state
 classifier/lada_model.gensim.state.sstats.npy
 classifier/document_topics.json
+classifier/labels.json
