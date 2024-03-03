@@ -1,3 +1,4 @@
+import gzip
 import json
 import math
 import re
@@ -17,17 +18,9 @@ class SearchEngine:
             .splitlines()
         )
 
-    # @staticmethod
-    # no zipped
-    # def load_index(index_file: str) -> dict:
-    #     with open(index_file, "r", encoding="utf-8") as file:
-    #         return json.load(file)
     @staticmethod
     def load_index(index_file: str) -> dict:
-        """
-        Load the zipped inverted index from the file
-        """
-        with gzip.open(index_file, "rt", encoding="utf-8") as file:
+        with open(index_file, "r", encoding="utf-8") as file:
             return json.load(file)
 
     def execute_query(self, query: str) -> Set[int]:
@@ -216,7 +209,7 @@ class SearchEngine:
                     doc_scores[doc_id] += weight
         # Sort documents in descending order of TF-IDF score
         ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-        return ranked_docs[:10]  # Return first 150 documents
+        return ranked_docs[:150]  # Return first 150 documents
 
 
 if __name__ == "__main__":
@@ -228,9 +221,7 @@ if __name__ == "__main__":
     # query = "income taxes"
     # query =  "#20(income, taxes)"
     # query = '"AI algorithm" OR bayes'
-    query = "ai"
-    #result = engine.execute_query(query)
-    result = engine.ranked_search(query)
-    query_time = time.time() - load_time
-    print(f"Query time: {query_time:.2f}s")
+    query = "algorithm"
+    result = engine.execute_query(query)
+    # result = engine.ranked_search(query)
     print(result)

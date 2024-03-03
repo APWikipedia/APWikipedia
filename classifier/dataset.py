@@ -11,13 +11,14 @@ def prepare_dataset(data_path):
     data = []
     for filename in os.listdir(data_path):
         if filename.endswith(".json"):
-            category = os.path.splitext(filename)[0]  # 使用 splitext 移除扩展名
+            category = os.path.splitext(filename)[0]
             file_path = os.path.join(data_path, filename)
 
             with open(file_path, "r", encoding="utf-8") as file:
                 articles = json.load(file)
                 for article in articles:
                     article_data = {
+                        "name": article["file_name"],
                         "token": article["content"]["token"],
                         "category": category,
                     }
@@ -27,8 +28,10 @@ def prepare_dataset(data_path):
 
 if __name__ == "__main__":
     df = prepare_dataset(PROCESSED_DATA_PATH)
-    df["token"].apply(lambda x: " ".join(x))
-    df = df[df["token"].notna() & df["token"].ne("")].reset_index(drop=True)
+    df = df[df["token"].notna() & df["token"].map(bool)].reset_index(drop=True)
+    assert all(
+        isinstance(row, list) for row in df["token"]
+    ), "Not all rows in 'token' are lists."
 
     df.to_csv(DATA_CSV_PATH, index=False)
 
