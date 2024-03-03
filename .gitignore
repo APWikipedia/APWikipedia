@@ -184,3 +184,11 @@ processed_data/
 inverted_index.json
 processed_data.csv
 *.joblib
+classifier/data.pickle
+classifier/lada_model.gensim
+classifier/lada_model.gensim.expElogbeta.npy
+classifier/lada_model.gensim.id2word
+classifier/lada_model.gensim.state
+classifier/lada_model.gensim.state.sstats.npy
+classifier/document_topics.json
+classifier/labels.json
