@@ -13,8 +13,6 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            # 如果你有一个可以从命令行运行的脚本，可以在这里设置
-            'apwikipedia=web_backend.app:main',
         ],
     },
 )
