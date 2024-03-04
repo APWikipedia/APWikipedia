@@ -9,8 +9,9 @@ from nltk.stem import PorterStemmer
 import gzip
 
 class SearchEngine:
-    def __init__(self, index_file: str) -> None:
-        self.inverted_index = self.load_index(index_file)
+    def __init__(self, index_file_with_tfidf: str, index_file_with_position: str) -> None:
+        self.inverted_index_with_tfidf = self.load_index(index_file_with_tfidf)
+        self.inverted_index_with_position = self.load_index(index_file_with_position)
         self.ps = PorterStemmer()
         self.stop_words = set(
             open("./preprocess/ttds_2023_english_stop_words.txt", encoding="utf-8")
@@ -78,8 +79,8 @@ class SearchEngine:
             for word in words:
                 if word.upper() not in ["AND", "OR", "NOT"]:
                     stemmed_word = self.ps.stem(word.lower())
-                    if stemmed_word in self.inverted_index:
-                        pos = pos.union(set(self.inverted_index[stemmed_word].keys()))
+                    if stemmed_word in self.inverted_index_with_position:
+                        pos = pos.union(set(self.inverted_index_with_position[stemmed_word].keys()))
             return pos
 
         result = set()
@@ -112,18 +113,18 @@ class SearchEngine:
         """
         # phrase_tokens = self.query_preprocess(query)
         # print(f"Preprocessed tokens: {phrase_tokens}")
-        if not phrase_tokens or phrase_tokens[0] not in self.inverted_index:
+        if not phrase_tokens or phrase_tokens[0] not in self.inverted_index_with_position:
             return set()
 
-        docs = set(self.inverted_index[phrase_tokens[0]].keys())
+        docs = set(self.inverted_index_with_position[phrase_tokens[0]].keys())
         for token in phrase_tokens[1:]:
-            if token not in self.inverted_index:
+            if token not in self.inverted_index_with_position:
                 return set()
-            docs &= set(self.inverted_index[token].keys())
+            docs &= set(self.inverted_index_with_position[token].keys())
 
         result_docs = []
         for doc in docs:
-            positions = [self.inverted_index[token][doc] for token in phrase_tokens]
+            positions = [self.inverted_index_with_position[token][doc] for token in phrase_tokens]
             for pos in positions[0]:
                 if all([(pos + i) in positions[i] for i in range(1, len(positions))]):
                     result_docs.append(doc)
@@ -160,15 +161,15 @@ class SearchEngine:
         token2 = self.ps.stem(match.group(3))
 
         # Check if in the index
-        if token1 not in self.inverted_index or token2 not in self.inverted_index:
+        if token1 not in self.inverted_index_with_position or token2 not in self.inverted_index_with_position:
             return set()
 
         # Find articles if two terms are closed less than the required distance
         results = set()
-        for doc_id in self.inverted_index[token1]:
-            if doc_id in self.inverted_index[token2]:
-                positions1 = self.inverted_index[token1][doc_id]
-                positions2 = self.inverted_index[token2][doc_id]
+        for doc_id in self.inverted_index_with_position[token1]:
+            if doc_id in self.inverted_index_with_position[token2]:
+                positions1 = self.inverted_index_with_position[token1][doc_id]
+                positions2 = self.inverted_index_with_position[token2][doc_id]
                 if self.compute_positions_within_distance(
                     positions1, positions2, distance
                 ):
@@ -176,78 +177,70 @@ class SearchEngine:
 
         return results
 
-    def compute_idf(self) -> None:
-        """
-        Calculate the IDF value of each word according to the formula
-        """
-        self.idf = {}
-        N = len(
-            {doc_id for postings in self.inverted_index.values() for doc_id in postings}
-        )
-        for term, postings in self.inverted_index.items():
-            df = len(postings)
-            self.idf[term] = math.log10(N / df)
+    #     """
+    #     TFIDF search, use TF-IDF value to return ranked search result
+    #     """
+    #     self.compute_idf()
+    #     self.compute_tf_idf()
+    #     query_tokens = self.query_preprocess(query)
 
-    def compute_tf_idf(self) -> None:
+    #     doc_scores = {}
+    #     for token in query_tokens:
+    #         if token in self.tf_idf:
+    #             for doc_id, weight in self.tf_idf[token].items():
+    #                 if doc_id not in doc_scores:
+    #                     doc_scores[doc_id] = 0
+    #                 doc_scores[doc_id] += weight
+    #     # Sort documents in descending order of TF-IDF score
+    #     ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
+    #     return ranked_docs[:10]  # Return first 150 documents
+    def ranked_search(self, query: str) -> List[Tuple[str, float]]:
         """
-        Calculate the TFIDF value for each word in each document according to the formula
+        Use TF-IDF values to return ranked search results
         """
-        self.tf_idf = {}
-        for term, postings in self.inverted_index.items():
-            if term not in self.tf_idf:
-                self.tf_idf[term] = {}
-            for doc_id, positions in postings.items():
-                tf = len(positions)
-                self.tf_idf[term][doc_id] = (1 + math.log10(tf)) * self.idf[term]
-
-    def ranked_search(self, query: str) -> List[Tuple[int, float]]:
-        """
-        TFIDF search, use TF-IDF value to return ranked search result
-        """
-        self.compute_idf()
-        self.compute_tf_idf()
         query_tokens = self.query_preprocess(query)
 
         doc_scores = {}
         for token in query_tokens:
-            if token in self.tf_idf:
-                for doc_id, weight in self.tf_idf[token].items():
+            if token in self.inverted_index_with_tfidf:
+                for doc_id, tf_idf_value in self.inverted_index_with_tfidf[token].items():
                     if doc_id not in doc_scores:
                         doc_scores[doc_id] = 0
-                    doc_scores[doc_id] += weight
-        # Sort documents in descending order of TF-IDF score
-        ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-        return ranked_docs[:10]  # Return first 150 documents
+                    doc_scores[doc_id] += tf_idf_value
 
+        # Sort documents in descending order of their scores
+        ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
+        return ranked_docs[:10]  # Return top 10 documents
 
 if __name__ == "__main__":
     start_time = time.time()
-    engine = SearchEngine("engine/inverted_index.json")
+    engine = SearchEngine("engine/lightweight_index.json", "engine/heavyweight_index.json")
     load_time = time.time() - start_time
     print(f"Load time: {load_time:.2f}s")
     # query = "income taxes"
     # query =  "#20(income, taxes)"
     # query = '"AI algorithm" OR bayes'
     query = "ai"
-    #result = engine.execute_query(query)
+    #results = engine.execute_query(query)
+
     results = engine.ranked_search(query)
     print(results)
     metadata={}
     
-    with open('engine/metadata.json', 'r', encoding='utf-8') as f:
-        metadata = json.load(f)
+    # with open('engine/metadata.json', 'r', encoding='utf-8') as f:
+    #     metadata = json.load(f)
     
-    articles = []
-    for title, score in results:
-        # 在元数据列表中搜索匹配的标题
-        for article in metadata:
-            if article['title'] == title:
-                # 找到匹配的文章后，添加到最终结果列表中
-                articles.append(article)
-                break  # 匹配到后就跳出循环，继续下一个搜索结果
+    # articles = []
+    # for title, score in results:
+    #     # 在元数据列表中搜索匹配的标题
+    #     for article in metadata:
+    #         if article['title'] == title:
+    #             # 找到匹配的文章后，添加到最终结果列表中
+    #             articles.append(article)
+    #             break  # 匹配到后就跳出循环，继续下一个搜索结果
 
     
-    query_time = time.time() - load_time
-    print(f"Query time: {query_time:.2f}s")
-    print(articles)
+    # query_time = time.time() - load_time
+    # print(f"Query time: {query_time:.2f}s")
+    # print(articles)
 

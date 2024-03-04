@@ -1,6 +1,7 @@
 import gzip
 import os
 import json
+import math
 from collections import defaultdict
 import gzip
 
@@ -15,40 +16,65 @@ def load_data(input_dir):
 
 def create_inverted_index(data):
     """
-    Create an zipped inverted index from the input data to save storage
+    Create both lightweight and heavyweight inverted indexes from the input data.
+    The lightweight index will not include position data and will store precomputed TF-IDF values.
+    The heavyweight index will include position data for proximity queries.
     """
-    inverted_index = defaultdict(lambda: defaultdict(list))
+    lightweight_index = defaultdict(dict)  # 不包含位置信息，将存储TF-IDF值
+    heavyweight_index = defaultdict(lambda: defaultdict(list))  # 包含位置信息
+    doc_frequency = defaultdict(int)  # 用于计算DF
+    doc_lengths = defaultdict(int)  # 存储每个文档的长度
+
+    # First pass: Build both indexes and compute document frequencies
     for document in data:
         file_name = document.get("file_name", "")
         content = document.get("content", {})
         tokens = content.get("token", [])
+        seen_tokens = set()  # Track tokens seen in this document to correctly compute DF
         for position, token in enumerate(tokens):
-            if file_name not in inverted_index[token]:
-                inverted_index[token][file_name] = [position]
+            # Update heavyweight index
+            if file_name not in heavyweight_index[token]:
+                heavyweight_index[token][file_name] = [position]
             else:
-                # 存储与前一位置的差值
-                inverted_index[token][file_name].append(position - inverted_index[token][file_name][-1])
-    return inverted_index
+                heavyweight_index[token][file_name].append(position - heavyweight_index[token][file_name][-1])
+
+            # Ensure each token is only counted once for DF per document
+            if token not in seen_tokens:
+                doc_frequency[token] += 1
+                seen_tokens.add(token)
+
+            doc_lengths[file_name] += 1
+
+    # Second pass: Compute TF-IDF for lightweight index
+    total_docs = len(data)
+    for token, docs in heavyweight_index.items():
+        idf = math.log10(total_docs / doc_frequency[token])
+        for file_name, positions in docs.items():
+            tf = len(positions)
+            tf_idf = (1 + math.log10(tf)) * idf
+            lightweight_index[token][file_name] = tf_idf
+
+    return lightweight_index, heavyweight_index
 
 
-# def save_inverted_index(inverted_index, output_file):
-#     # 转换数据结构为可序列化的格式
-#     serializable_index = {word: {doc: positions for doc, positions in docs.items()} 
-#                           for word, docs in inverted_index.items()}
-#     with open(output_file, 'w', encoding='utf-8') as file:
-#         json.dump(serializable_index, file, ensure_ascii=False, indent=4)
-def save_inverted_index(inverted_index, output_file):
+def save_inverted_index(lightweight_index, heavyweight_index, lw_output_file, hw_output_file):
     """
-    Use gzip to save storage
+    Save both lightweight and heavyweight inverted indexes using gzip to save storage.
     """
-    serializable_index = {word: {doc: positions for doc, positions in docs.items()}
-                          for word, docs in inverted_index.items()}
-    with gzip.open(output_file, 'wt', encoding='utf-8') as file:
-        json.dump(serializable_index, file, ensure_ascii=False)
+    # Save lightweight index
+    with gzip.open(lw_output_file, 'wt', encoding='utf-8') as file:
+        json.dump(lightweight_index, file, ensure_ascii=False)
+
+    # Save heavyweight index
+    with gzip.open(hw_output_file, 'wt', encoding='utf-8') as file:
+        json.dump({word: {doc: positions for doc, positions in docs.items()}
+                  for word, docs in heavyweight_index.items()}, file, ensure_ascii=False)
+
 
 if __name__ == "__main__":        
     input_dir = 'processed_data/'         
-    output_file = 'engine/inverted_index.json'   
+    lw_output_file = 'engine/lightweight_index.json'
+    hw_output_file = 'engine/heavyweight_index.json'
     data = load_data(input_dir)
-    inverted_index = create_inverted_index(data)
-    save_inverted_index(inverted_index, output_file)
+    lightweight_index, heavyweight_index = create_inverted_index(data)
+    save_inverted_index(lightweight_index, heavyweight_index, lw_output_file, hw_output_file)

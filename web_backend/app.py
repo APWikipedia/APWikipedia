@@ -15,7 +15,7 @@ def load_metadata(metadata_file):
         return json.load(file)
     
 # 初始化 SearchEngine 实例并保存为全局变量
-app.search_engine = SearchEngine("engine/inverted_index.json")
+app.search_engine = SearchEngine("engine/lightweight_index.json", "engine/heavyweight_index.json")
 app.metadata = load_metadata('engine/metadata.json')
 
 
