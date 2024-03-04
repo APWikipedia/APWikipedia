@@ -222,8 +222,7 @@ class SearchEngine:
 
 if __name__ == "__main__":
     start_time = time.time()
-    engine = SearchEngine("engine/inverted_index_zipped.json")
-    #ngine = SearchEngine("engine/inverted_index.json")
+    engine = SearchEngine("engine/inverted_index.json")
     load_time = time.time() - start_time
     print(f"Load time: {load_time:.2f}s")
     # query = "income taxes"
@@ -231,7 +230,24 @@ if __name__ == "__main__":
     # query = '"AI algorithm" OR bayes'
     query = "ai"
     #result = engine.execute_query(query)
-    result = engine.ranked_search(query)
+    results = engine.ranked_search(query)
+    print(results)
+    metadata={}
+    
+    with open('engine/metadata.json', 'r', encoding='utf-8') as f:
+        metadata = json.load(f)
+    
+    articles = []
+    for title, score in results:
+        # 在元数据列表中搜索匹配的标题
+        for article in metadata:
+            if article['title'] == title:
+                # 找到匹配的文章后，添加到最终结果列表中
+                articles.append(article)
+                break  # 匹配到后就跳出循环，继续下一个搜索结果
+
+    
     query_time = time.time() - load_time
     print(f"Query time: {query_time:.2f}s")
-    print(result)
+    print(articles)
+
