@@ -4,7 +4,7 @@ import math
 import re
 import time
 from typing import List, Set, Tuple
-
+from spellchecker import SpellChecker
 from nltk.stem import PorterStemmer
 import gzip
 
@@ -54,6 +54,7 @@ class SearchEngine:
         """
         tokens = re.findall(r"\b\w+\b", query.lower())
         boolean_operators = ["and", "or", "not"]
+        spell = SpellChecker()
 
         processed_tokens = []
         for word in tokens:
@@ -61,7 +62,10 @@ class SearchEngine:
                 processed_tokens.append(word.upper())
             elif word.isalpha() and word not in self.stop_words:
                 processed_tokens.append(self.ps.stem(word))
-        return processed_tokens
+        suggested_tokens = []
+        for word in processed_tokens:
+            suggested_tokens.append(spell.correction(word))
+        return processed_tokens, suggested_tokens
 
     def mix_search(self, text: str) -> Set[str]:
         """
