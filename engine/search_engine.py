@@ -4,7 +4,6 @@ import math
 import re
 import time
 from typing import List, Set, Tuple
-from spellchecker import SpellChecker
 from nltk.stem import PorterStemmer
 import gzip
 
@@ -55,7 +54,6 @@ class SearchEngine:
         """
         tokens = re.findall(r"\b\w+\b", query.lower())
         boolean_operators = ["and", "or", "not"]
-        spell = SpellChecker()
 
         processed_tokens = []
         for word in tokens:
@@ -63,10 +61,8 @@ class SearchEngine:
                 processed_tokens.append(word.upper())
             elif word.isalpha() and word not in self.stop_words:
                 processed_tokens.append(self.ps.stem(word))
-        suggested_tokens = []
-        for word in processed_tokens:
-            suggested_tokens.append(spell.correction(word))
-        return processed_tokens, suggested_tokens
+        
+        return processed_tokens
 
     def mix_search(self, text: str) -> Set[str]:
         """
@@ -181,23 +177,6 @@ class SearchEngine:
 
         return results
 
-    #     """
-    #     TFIDF search, use TF-IDF value to return ranked search result
-    #     """
-    #     self.compute_idf()
-    #     self.compute_tf_idf()
-    #     query_tokens = self.query_preprocess(query)
-
-    #     doc_scores = {}
-    #     for token in query_tokens:
-    #         if token in self.tf_idf:
-    #             for doc_id, weight in self.tf_idf[token].items():
-    #                 if doc_id not in doc_scores:
-    #                     doc_scores[doc_id] = 0
-    #                 doc_scores[doc_id] += weight
-    #     # Sort documents in descending order of TF-IDF score
-    #     ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-    #     return ranked_docs[:10]  # Return first 150 documents
     def ranked_search(self, query: str) -> List[Tuple[str, float]]:
         """
         Use TF-IDF values to return ranked search results
@@ -214,7 +193,7 @@ class SearchEngine:
 
         # Sort documents in descending order of their scores
         ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-        return ranked_docs[:10]  # Return top 10 documents
+        return ranked_docs[:10] # Return top 10 documents
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -227,8 +206,9 @@ if __name__ == "__main__":
     query = "ai"
     #results = engine.execute_query(query)
 
-    results = engine.ranked_search(query)
+    results, query_time = engine.ranked_search(query)
     print(results)
+    print(f"Query time: {query_time:.2f}s")
     metadata={}
     
     # with open('engine/metadata.json', 'r', encoding='utf-8') as f:
