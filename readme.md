@@ -12,21 +12,9 @@
 
 **5. Host Online**
 
-**1. WebFrontEnd (Full functions) Yueshuang**
-
-**2. WebBackEnd (optimize Storage and Speed) Yuhang**
-
-**3. Tags, LM Yongteng**
-
-**4. L2R TianYue**
-
-**5. Host Online**
-
 ## 预处理和查询
 
 **1. 首先merge原数据data**
-
-`python preprocess/merge_file.py`
 
 `python preprocess/merge_file.py`
 
@@ -34,7 +22,7 @@
 
 `python preprocess/text_to_corpus.py`
 
-**3.  利用preprocess_data建立index**
+**3. 利用preprocess_data建立index**
 
 `python engine/build_index.py`
 
@@ -42,7 +30,9 @@
 
 `python engine/search_engine.py`
 
+**5. 使用原数据建立metadata**
 
+`python preprocess/build_metadata.py`
 
 ## 模型训练
 
@@ -58,12 +48,12 @@
 
 `python classifier/prediction.py`
 
+## 前后端交互
 
-
-# 前后端交互
 **初始化项目**
+
 ```
-pip install -e .
+pip install -e.
 ```
 
 **目前地址：**
@@ -71,8 +61,6 @@ pip install -e .
 http://localhost:5000/search
 
 http://localhost:5000/ranked_search
-
-
 
 **前端请求格式：**
 
@@ -85,8 +73,6 @@ http://localhost:5000/ranked_search
     "body": "{\"query\": \"查询的query\"}"
 }
 ```
-
-
 
 **后端返回格式（以ranked_search为例，只展示了前5个）：**
 
