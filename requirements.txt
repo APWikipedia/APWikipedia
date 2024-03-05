@@ -1,0 +1,9 @@
+nltk~=3.8.1
+pywikibot~=8.6.0
+setuptools~=68.2.2
+pandas~=2.1.3
+joblib~=1.3.2
+scikit-learn~=1.3.2
+gensim~=4.3.2
+flask~=3.0.2
+pyspellchecker~=0.8.1
