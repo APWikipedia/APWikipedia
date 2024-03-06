@@ -11,6 +11,10 @@ from flask_cors import CORS
 from web_backend.api.resources import SearchResource, RankedSearchResource
 from engine.search_engine import SearchEngine
 import json
+from collections import defaultdict
+def default_dict_list():
+    return defaultdict(list)
+
 
 
 app = Flask(__name__)
@@ -22,7 +26,7 @@ def load_metadata(metadata_file):
         return json.load(file)
     
 # 初始化 SearchEngine 实例并保存为全局变量
-app.search_engine = SearchEngine("engine/lightweight_index.json", "engine/heavyweight_index.json")
+app.search_engine = SearchEngine("engine/lightweight_index.pkl", "engine/heavyweight_index.pkl")
 app.metadata = load_metadata('engine/metadata.json')
 
 

@@ -194,3 +194,4 @@ classifier/lada_model.gensim.state.sstats.npy
 classifier/document_topics.json
 classifier/labels.json
 *.json
+*.pkl

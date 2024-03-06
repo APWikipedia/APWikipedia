@@ -1,11 +1,17 @@
 import gzip
 import json
 import math
+import pickle
 import re
 import time
 from typing import List, Set, Tuple
+
 from nltk.stem import PorterStemmer
-import gzip
+
+from collections import defaultdict
+def default_dict_list():
+    return defaultdict(list)
+
 
 class SearchEngine:
     def __init__(self, index_file_with_tfidf: str, index_file_with_position: str) -> None:
@@ -18,19 +24,23 @@ class SearchEngine:
             .splitlines()
         )
 
-    # @staticmethod
-    # no zipped
-    # def load_index(index_file: str) -> dict:
-    #     with open(index_file, "r", encoding="utf-8") as file:
-    #         return json.load(file)
     @staticmethod
     def load_index(index_file: str) -> dict:
         """
-        Load the zipped inverted index from the file
+        使用pickle加载倒排索引
         """
-        with gzip.open(index_file, "rt", encoding="utf-8") as file:
-            return json.load(file)
+        with open(index_file, 'rb') as file:
+            return pickle.load(file)
+        
+    # @staticmethod
+    # def load_index(index_file: str) -> dict:
+    #     """
+    #     Load the zipped inverted index from the file
+    #     """
+    #     with gzip.open(index_file, "rt", encoding="utf-8") as file:
+    #         return json.load(file)
 
+    
     def execute_query(self, query: str) -> Set[int]:
         """
         Entry function for queires.boolean.txt
@@ -198,16 +208,17 @@ class SearchEngine:
 
 if __name__ == "__main__":
     start_time = time.time()
-    engine = SearchEngine("engine/lightweight_index.json", "engine/heavyweight_index.json")
+    engine = SearchEngine("engine/lightweight_index.pkl", "engine/heavyweight_index.pkl")
     load_time = time.time() - start_time
     print(f"Load time: {load_time:.2f}s")
     # query = "income taxes"
     # query =  "#20(income, taxes)"
     # query = '"AI algorithm" OR bayes'
     query = "ai"
-    #results = engine.execute_query(query)
-
-    results = engine.ranked_search(query)
+    # results = engine.ranked_search(query)
+    results = engine.execute_query(query)
+    query_time = time.time()  - start_time
+    print(f"Query time: {query_time*1000}ms")
     print(results)
     metadata={}
     

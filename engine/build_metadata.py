@@ -1,5 +1,6 @@
 import os
 import json
+import pickle
 
 def load_tags(tags_file):
     with open(tags_file, 'r', encoding='utf-8') as file:

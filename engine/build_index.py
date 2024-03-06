@@ -4,6 +4,7 @@ import json
 import math
 from collections import defaultdict
 import gzip
+import pickle
 
 def load_data(input_dir):
     data = []
@@ -14,6 +15,9 @@ def load_data(input_dir):
                 data.extend(json.load(file))
     return data
 
+def default_dict_list():
+    return defaultdict(list)
+
 def create_inverted_index(data):
     """
     Create both lightweight and heavyweight inverted indexes from the input data.
@@ -21,7 +25,7 @@ def create_inverted_index(data):
     The heavyweight index will include position data for proximity queries.
     """
     lightweight_index = defaultdict(dict)  # 不包含位置信息，将存储TF-IDF值
-    heavyweight_index = defaultdict(lambda: defaultdict(list))  # 包含位置信息
+    heavyweight_index = defaultdict(default_dict_list) # 包含位置信息
     doc_frequency = defaultdict(int)  # 用于计算DF
     doc_lengths = defaultdict(int)  # 存储每个文档的长度
 
@@ -69,12 +73,23 @@ def save_inverted_index(lightweight_index, heavyweight_index, lw_output_file, hw
     with gzip.open(hw_output_file, 'wt', encoding='utf-8') as file:
         json.dump({word: {doc: positions for doc, positions in docs.items()}
                   for word, docs in heavyweight_index.items()}, file, ensure_ascii=False)
+        
+def save_inverted_index_pickle(lightweight_index, heavyweight_index, lw_output_file, hw_output_file):
+    """
+    使用pickle保存轻量级和重量级倒排索引
+    """
+    # 保存轻量级索引
+    with open(lw_output_file, 'wb') as file:
+        pickle.dump(lightweight_index, file)
 
+    # 保存重量级索引
+    with open(hw_output_file, 'wb') as file:
+        pickle.dump(heavyweight_index, file)
 
 if __name__ == "__main__":        
     input_dir = 'processed_data/'         
-    lw_output_file = 'engine/lightweight_index.json'
-    hw_output_file = 'engine/heavyweight_index.json'
+    lw_output_file = 'engine/lightweight_index.pkl'
+    hw_output_file = 'engine/heavyweight_index.pkl'
     data = load_data(input_dir)
     lightweight_index, heavyweight_index = create_inverted_index(data)
-    save_inverted_index(lightweight_index, heavyweight_index, lw_output_file, hw_output_file)
+    save_inverted_index_pickle(lightweight_index, heavyweight_index, lw_output_file, hw_output_file)
