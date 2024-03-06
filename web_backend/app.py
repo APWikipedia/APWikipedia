@@ -1,10 +1,20 @@
 import sys
+<<<<<<< Updated upstream
 from pathlib import Path 
 
 root_path = str(Path(__file__).parent.parent.resolve()) 
 if root_path not in sys.path: 
     sys.path.append(root_path)
     
+=======
+from pathlib import Path
+
+root_path = str(Path(__file__).parent.parent.resolve()) 
+if root_path not in sys.path: 
+  sys.path.append(root_path)
+
+import sys
+>>>>>>> Stashed changes
 from flask import Flask, current_app
 from flask_restful import Api
 from flask_cors import CORS

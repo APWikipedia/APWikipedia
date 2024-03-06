@@ -186,6 +186,7 @@ class SearchEngine:
         doc_scores = {}
         for token in query_tokens:
             if token in self.inverted_index_with_tfidf:
+                print(f"Token type: {type(token)}, Token value: {token}")
                 for doc_id, tf_idf_value in self.inverted_index_with_tfidf[token].items():
                     if doc_id not in doc_scores:
                         doc_scores[doc_id] = 0
@@ -206,8 +207,14 @@ if __name__ == "__main__":
     query = "ai"
     #results = engine.execute_query(query)
 
+<<<<<<< Updated upstream
     results= engine.ranked_search(query)
     print(results)
+=======
+    results = engine.ranked_search(query)
+    print(results)
+    # print(f"Query time: {query_time:.2f}s")
+>>>>>>> Stashed changes
     metadata={}
     
     # with open('engine/metadata.json', 'r', encoding='utf-8') as f:
