@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="result.css">
+</head>
+
+<body>
+    <div class="search-container">
+        <div class="input-group">
+            <label for="searchQuery" class="search-label">APWikipedia</label>
+            <input type="text" id="searchQuery" class="search-box" placeholder="Enter your search query">
+            <button id="searchButton" class="search-btn">Search</button>
+            <div class="search-options">
+                <input type="radio" id="defaultSearch" name="searchMode" checked>
+                <label for="defaultSearch">Default Search</label>
+                <input type="radio" id="mixSearch" name="searchMode">
+                <label for="mixSearch">Mix Search</label>
+                <input type="radio" id="phraseSearch" name="searchMode">
+                <label for="phraseSearch">Phrase Search</label>
+                <input type="radio" id="proximitySearch" name="searchMode">
+                <label for="proximitySearch">Proximity Search</label>
+                <input type="radio" id="rankedSearch" name="searchMode">
+                <label for="rankedSearch">Ranked Search</label>
+            </div>
+        </div>
+        <div id="searchResults" class="search-results">Loading Page...</div>
+        <script src="result.js"></script>
+</body>
+
+</html>

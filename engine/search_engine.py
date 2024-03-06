@@ -207,14 +207,8 @@ if __name__ == "__main__":
     query = "ai"
     #results = engine.execute_query(query)
 
-<<<<<<< Updated upstream
-    results= engine.ranked_search(query)
-    print(results)
-=======
     results = engine.ranked_search(query)
     print(results)
-    # print(f"Query time: {query_time:.2f}s")
->>>>>>> Stashed changes
     metadata={}
     
     # with open('engine/metadata.json', 'r', encoding='utf-8') as f:
