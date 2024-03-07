@@ -7,8 +7,10 @@ class SearchResource(Resource):
         start_time = time.time() * 1000
         data = request.get_json()
         query = data.get('query')
+        page_number = data.get('page_number', 1)
+        page_size = data.get('page_size', 10)
         if query:
-            search_results = current_app.search_engine.execute_query(query)
+            search_results = current_app.search_engine.execute_query(query, page_number, page_size)
             results = []
             for title in search_results:
                 for article in current_app.metadata:
@@ -17,7 +19,9 @@ class SearchResource(Resource):
                         break
             search_time = time.time() * 1000 - start_time             
             return {"results": results,
-                    "search_time(Ms)": search_time}, 200
+                    "search_time(Ms)": search_time,
+                    "page_number": page_number,
+                    "page_size": page_size}, 200
         return {"message": "Query cannot be blank!"}, 400
 
 class RankedSearchResource(Resource):

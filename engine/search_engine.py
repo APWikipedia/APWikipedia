@@ -41,22 +41,22 @@ class SearchEngine:
     #         return json.load(file)
 
     
-    def execute_query(self, query: str) -> Set[int]:
+    def execute_query(self, query: str, page_number: int = 1, page_size: int = 10) -> Set[int]:
         """
         Entry function for queires.boolean.txt
         Check for query type
         """
         tokens = self.query_preprocess(query)
         if "#" in query:  # Check for proximity query
-            return self.proximity_search(query)
-        elif '"' in query:  # Check for phrase query
+            return self.proximity_search(query, page_number, page_size)
+        elif "'" in query:  # Check for phrase query
             if "AND" in query or "OR" in query:
-                return self.mix_search(query)
-            return self.phrase_search(tokens)
+                return self.mix_search(query, page_number, page_size)
+            return self.phrase_search(tokens, page_number, page_size)
         elif any(op in query for op in ["AND", "OR", "NOT"]):
-            return self.mix_search(query)
+            return self.mix_search(query, page_number, page_size)
         else:
-            return self.phrase_search(tokens)
+            return self.phrase_search(tokens, page_number, page_size)
 
     def query_preprocess(self, query: str) -> List[str]:
         """
@@ -74,7 +74,7 @@ class SearchEngine:
         
         return processed_tokens
 
-    def mix_search(self, text: str) -> Set[str]:
+    def mix_search(self, text: str, page_number: int = 1, page_size: int = 10) -> List[str]:
         """
         Special search with both operators (AND, OR, NOT) and phrases
         """
@@ -94,8 +94,8 @@ class SearchEngine:
             return pos
 
         result = set()
-        phrases = re.findall(r'"(.*?)"', text)
-        other_words = re.sub(r'"(.*?)"', "", text).split()
+        phrases = re.findall(r"'(.*?)'", text)
+        other_words = re.sub(r"'(.*?)'", "", text).split()
 
         if phrases:
             pos1 = extract_positions(phrases[0], other_words)
@@ -113,10 +113,11 @@ class SearchEngine:
                     if "OR NOT" not in text
                     else pos1.union(set(self.index.keys()) - pos2)
                 )
+        start_index = (page_number - 1) * page_size
+        end_index = start_index + page_size
+        return list(result)[start_index:end_index] 
 
-        return result
-
-    def phrase_search(self, phrase_tokens: List[str]) -> Set[int]:
+    def phrase_search(self, phrase_tokens: List[str], page_number: int = 1, page_size: int = 10) -> Set[int]:
         """
         Phase search
         Find all documents if they contain token from the phrase query statement
@@ -132,14 +133,16 @@ class SearchEngine:
                 return set()
             docs &= set(self.inverted_index_with_position[token].keys())
 
-        result_docs = []
+        result_docs = set()
         for doc in docs:
             positions = [self.inverted_index_with_position[token][doc] for token in phrase_tokens]
             for pos in positions[0]:
                 if all([(pos + i) in positions[i] for i in range(1, len(positions))]):
-                    result_docs.append(doc)
+                    result_docs.add(doc)
                     break
-        return set(result_docs)
+        start_index = (page_number - 1) * page_size
+        end_index = start_index + page_size
+        return list(result_docs)[start_index:end_index] 
 
     def compute_positions_within_distance(
         self, positions1: List[int], positions2: List[int], distance: int
@@ -157,7 +160,7 @@ class SearchEngine:
                 j += 1
         return False
 
-    def proximity_search(self, query: str) -> Set[int]:
+    def proximity_search(self, query: str, page_number: int = 1, page_size: int = 10) -> Set[int]:
         """
         Promimity search, only for query like this: #20(income, taxes)
         """
@@ -184,8 +187,9 @@ class SearchEngine:
                     positions1, positions2, distance
                 ):
                     results.add(doc_id)
-
-        return results
+        start_index = (page_number - 1) * page_size
+        end_index = start_index + page_size
+        return list(results)[start_index:end_index]
 
     def ranked_search(self, query: str, page_number: int = 1, page_size: int = 10) -> List[Tuple[str, float]]:
         """
