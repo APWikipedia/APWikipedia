@@ -187,7 +187,7 @@ class SearchEngine:
 
         return results
 
-    def ranked_search(self, query: str) -> List[Tuple[str, float]]:
+    def ranked_search(self, query: str, page_number: int = 1, page_size: int = 10) -> List[Tuple[str, float]]:
         """
         Use TF-IDF values to return ranked search results
         """
@@ -204,7 +204,9 @@ class SearchEngine:
 
         # Sort documents in descending order of their scores
         ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
-        return ranked_docs[:10] # Return top 10 documents
+        start_index = (page_number - 1) * page_size
+        end_index = start_index + page_size
+        return ranked_docs[start_index:end_index]  # Return top 10 documents
 
 if __name__ == "__main__":
     start_time = time.time()
