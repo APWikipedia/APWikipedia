@@ -1,16 +1,15 @@
 <template>
   <div class="search-container">
-    <input v-model="searchQuery" @keyup.enter="search" placeholder="Enter the search query..." class="search-input" />
-    <button @click="search" class="search-button">Search</button>
+    <input v-model="searchQuery" @keyup.enter="search" placeholder="请输入搜索内容..." class="search-input" />
+    <button @click="search" class="search-button">搜索</button>
     <div v-if="searchResults.length > 0" class="results-container">
       <div v-for="result in searchResults" :key="result.url" class="search-result">
-        <!-- <h3 class="result-title">{{ result.title }}</h3>
-        <a :href="result.url" target="_blank" class="result-link">阅读更多</a> -->
-        <h3><a :href="result.url" target="_blank" class="result-link">{{ result.title }}</a></h3>
+        <h3 class="result-title">{{ result.title }}</h3>
         <p class="result-summary">{{ result.summary }}</p>
+        <a :href="result.url" target="_blank" class="result-link">阅读更多</a>
       </div>
-      <div v-if="searchTime !== null" class="search-time">Search Time: {{ searchTime }} ms</div>
     </div>
+    <div v-if="searchTime !== null" class="search-time">搜索耗时：{{ searchTime }}毫秒</div>
   </div>
 </template>
 
@@ -23,7 +22,7 @@ const searchTime = ref(null);
 
 const search = async () => {
   if (searchQuery.value.trim() === '') {
-    alert('The search query cannot be empty');
+    alert('请输入搜索关键词');
     return;
   }
 
@@ -41,7 +40,7 @@ const search = async () => {
     searchResults.value = data.results || [];
     searchTime.value = data['search_time(Ms)'] || null;
   } catch (error) {
-    console.error("Request Error:", error);
+    console.error("搜索请求失败:", error);
     searchResults.value = [];
   }
 };
@@ -76,7 +75,6 @@ const search = async () => {
 }
 
 .results-container {
-  text-align: left;
   margin-top: 20px;
 }
 
@@ -98,10 +96,5 @@ const search = async () => {
 .result-link {
   color: #1e88e5;
   text-decoration: none;
-}
-
-.search-time {
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 </style>
