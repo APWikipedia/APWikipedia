@@ -1,4 +1,6 @@
-# apwikipedia
+## Before
+1. Download node.js - which incloud npm
+2. Keep package.json
 
 ## Project setup
 ```

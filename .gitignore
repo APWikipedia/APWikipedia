@@ -195,3 +195,4 @@ classifier/document_topics.json
 classifier/labels.json
 *.json
 *.pkl
+!package.json
