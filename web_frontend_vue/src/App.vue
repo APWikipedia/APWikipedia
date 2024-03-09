@@ -1,18 +1,19 @@
 <template>
   <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
   <!-- 使用 SearchComponent 组件 -->
-  <search-component></search-component>
+  <!-- <search-component></search-component> -->
+  <router-view></router-view>
 </template>
 
 
 <script>
-import SearchComponent from './components/SearchComponent.vue';
+// import SearchComponent from './components/SearchComponent.vue';
 
 export default {
   name: 'App',
-  components: {
-    SearchComponent
-  }
+  // components: {
+  //   SearchComponent
+  // }
 }
 </script>
 
