@@ -54,3 +54,12 @@ class SpellCheckerResouce(Resource):
             spell_checked_query = current_app.spell_checker.spell_check(query)
             return {"spell_checked_query": spell_checked_query}, 200
         return {"spell_checked_query": ""}, 200
+    
+class QueryExpansionResource(Resource):
+    def post(self):
+        data = request.get_json()
+        query = data.get('query')
+        if query:
+            expanded_query = current_app.spell_checker.spell_check(query)
+            return {"expanded_query": expanded_query}, 200
+        return {"expanded_query": ""}, 200
