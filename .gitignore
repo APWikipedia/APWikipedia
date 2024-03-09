@@ -195,4 +195,5 @@ classifier/document_topics.json
 classifier/labels.json
 *.json
 *.pkl
+node_modules/
 !package.json

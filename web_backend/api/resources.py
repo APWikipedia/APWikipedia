@@ -46,3 +46,11 @@ class RankedSearchResource(Resource):
                     "page_size": page_size}, 200
         return {"message": "Query cannot be blank!"}, 400
 
+class SpellCheckerResouce(Resource):
+    def post(self):
+        data = request.get_json()
+        query = data.get('query')
+        if query:
+            spell_checked_query = current_app.spell_checker.spell_check(query)
+            return {"spell_checked_query": spell_checked_query}, 200
+        return {"spell_checked_query": ""}, 200
