@@ -34,7 +34,7 @@ app.metadata = load_metadata('engine/metadata.json')
 
 api.add_resource(SearchResource, '/search')
 api.add_resource(RankedSearchResource, '/ranked_search')
-api.add_resource(SpellCheckerResouce, '/spell_check')
+# api.add_resource(SpellCheckerResouce, '/spell_check')
 api.add_resource(QueryExpansionResource, '/query_expansion')
 
 
