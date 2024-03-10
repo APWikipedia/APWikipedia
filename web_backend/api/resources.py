@@ -10,7 +10,7 @@ class SearchResource(Resource):
         page_number = data.get('page_number', 1)
         page_size = data.get('page_size', 10)
         if query:
-            search_results = current_app.search_engine.execute_query(query, page_number, page_size)
+            search_results, length = current_app.search_engine.execute_query(query, page_number, page_size)
             results = []
             for title in search_results:
                 for article in current_app.metadata:
@@ -21,7 +21,8 @@ class SearchResource(Resource):
             return {"results": results,
                     "search_time(Ms)": search_time,
                     "page_number": page_number,
-                    "page_size": page_size}, 200
+                    "page_size": page_size,
+                    "total length": length}, 200
         return {"message": "Query cannot be blank!"}, 400
 
 class RankedSearchResource(Resource):
@@ -32,7 +33,7 @@ class RankedSearchResource(Resource):
         page_number = data.get('page_number', 1)
         page_size = data.get('page_size', 10)
         if query:
-            ranked_results = current_app.search_engine.ranked_search(query, page_number, page_size)
+            ranked_results, length = current_app.search_engine.ranked_search(query, page_number, page_size)
             results = []
             for title, _ in ranked_results:
                 for article in current_app.metadata:
@@ -43,7 +44,8 @@ class RankedSearchResource(Resource):
             return {"results": results,
                     "search_time(Ms)": search_time,
                     "page_number": page_number,
-                    "page_size": page_size}, 200
+                    "page_size": page_size,
+                    "total length": length}, 200
         return {"message": "Query cannot be blank!"}, 400
 
 class SpellCheckerResouce(Resource):
@@ -51,8 +53,9 @@ class SpellCheckerResouce(Resource):
         data = request.get_json()
         query = data.get('query')
         if query:
-            spell_checked_query = current_app.spell_checker.spell_check(query)
-            return {"spell_checked_query": spell_checked_query}, 200
+            pass
+            # spell_checked_query = current_app.spell_checker.spell_check(query)
+            # return {"spell_checked_query": spell_checked_query}, 200
         return {"spell_checked_query": ""}, 200
     
 class QueryExpansionResource(Resource):
@@ -60,6 +63,7 @@ class QueryExpansionResource(Resource):
         data = request.get_json()
         query = data.get('query')
         if query:
-            expanded_query = current_app.spell_checker.spell_check(query)
-            return {"expanded_query": expanded_query}, 200
+            pass
+            # expanded_query = current_app.spell_checker.spell_check(query)
+            # return {"expanded_query": expanded_query}, 200
         return {"expanded_query": ""}, 200

@@ -115,7 +115,7 @@ class SearchEngine:
                 )
         start_index = (page_number - 1) * page_size
         end_index = start_index + page_size
-        return list(result)[start_index:end_index] 
+        return list(result)[start_index:end_index], len(result)
 
     def phrase_search(self, phrase_tokens: List[str], page_number: int = 1, page_size: int = 10) -> Set[int]:
         """
@@ -142,7 +142,7 @@ class SearchEngine:
                     break
         start_index = (page_number - 1) * page_size
         end_index = start_index + page_size
-        return list(result_docs)[start_index:end_index] 
+        return list(result_docs)[start_index:end_index] , len(result_docs)
 
     def compute_positions_within_distance(
         self, positions1: List[int], positions2: List[int], distance: int
@@ -189,7 +189,7 @@ class SearchEngine:
                     results.add(doc_id)
         start_index = (page_number - 1) * page_size
         end_index = start_index + page_size
-        return list(results)[start_index:end_index]
+        return list(results)[start_index:end_index], len(results)
 
     def ranked_search(self, query: str, page_number: int = 1, page_size: int = 10) -> List[Tuple[str, float]]:
         """
@@ -210,7 +210,7 @@ class SearchEngine:
         ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)
         start_index = (page_number - 1) * page_size
         end_index = start_index + page_size
-        return ranked_docs[start_index:end_index]  # Return top 10 documents
+        return ranked_docs[start_index:end_index] , len(ranked_docs) # Return top 10 documents
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     # query = '"AI algorithm" OR bayes'
     query = "ai"
     # results = engine.ranked_search(query)
-    results = engine.execute_query(query)
+    results, _ = engine.execute_query(query)
     query_time = time.time()  - start_time
     print(f"Query time: {query_time*1000}ms")
     print(results)
