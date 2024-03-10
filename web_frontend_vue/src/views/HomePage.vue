@@ -10,7 +10,7 @@ import SearchComponent from '../components/SearchComponent.vue';
 
 export default {
     components: {
-        SearchComponent,
+        SearchComponent
     },
 };
 </script>
@@ -20,7 +20,7 @@ export default {
     position: absolute;
     top: 30%;
     left: 50%;
-    transform: translate(-50%, -50%); /* 向上和向左移动自身宽高的50% */
+    transform: translate(-50%, -50%);
 }
 
 .search-h1 {

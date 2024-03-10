@@ -29,12 +29,12 @@ def load_metadata(metadata_file):
 # 初始化 SearchEngine 实例并保存为全局变量
 app.search_engine = SearchEngine("engine/lightweight_index.pkl", "engine/heavyweight_index.pkl")
 app.metadata = load_metadata('engine/metadata.json')
-app.spell_checker = Spell_Checker()
+# app.spell_checker = Spell_Checker()
 
 
 api.add_resource(SearchResource, '/search')
 api.add_resource(RankedSearchResource, '/ranked_search')
-api.add_resource(SpellCheckerResouce, '/spell_check')
+# api.add_resource(SpellCheckerResouce, '/spell_check')
 api.add_resource(QueryExpansionResource, '/query_expansion')
 
 

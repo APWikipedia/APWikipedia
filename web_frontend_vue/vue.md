@@ -5,8 +5,8 @@
 4. npm run serve
 
 # TODO
-* 使用vue router实现页面home和result页面切换 ✔
-* 分页
+* 使用vue router实现页面home和页面result切换 ✔
+* 分页 - 总数据条数length，限制显示在页面上的页面数为10个
 * 搜索框优化高级搜索选项
 * spell check和搜索扩展
 

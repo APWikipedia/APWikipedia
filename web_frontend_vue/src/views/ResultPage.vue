@@ -10,6 +10,10 @@
                 <h3><a :href="result.url" target="_blank" class="result-link">{{ result.title }}</a></h3>
                 <p class="result-summary">{{ result.summary }}</p>
             </div>
+            <!-- <PaginationComponent :currentPage="currentPage" :pageSize="pageSize" :totalCount="searchResults.length"
+                    @page-changed="handlePageChange" /> -->
+            <PaginationComponent :currentPage="currentPage" :pageSize="pageSize" :totalCount=50
+                @page-changed="handlePageChange" />
         </div>
         <div v-else-if="searched" class="no-results">No results found.</div>
     </div>
@@ -17,6 +21,7 @@
 
 <script>
 import SearchComponent from '../components/SearchComponent.vue';
+import PaginationComponent from '../components/PaginationComponent.vue';
 
 export default {
     data() {
@@ -25,10 +30,13 @@ export default {
             searchResults: [],
             searchTime: null,
             searched: false, // 用于跟踪是否已经进行了搜索
+            currentPage: 1,
+            pageSize: 10
         };
     },
     components: {
         SearchComponent,
+        PaginationComponent
     },
     watch: {
         '$route.query.q': {
@@ -38,6 +46,13 @@ export default {
             },
         },
     },
+    // computed: {
+    //     currentItems() {
+    //         const start = (this.currentPage - 1) * this.pageSize;
+    //         const end = start + this.pageSize;
+    //         return this.items.slice(start, end);
+    //     }
+    // },
     methods: {
         async searchStepTwo() {
             this.searchQuery = this.$route.query.q;
@@ -47,7 +62,11 @@ export default {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query: this.searchQuery }),
+                body: JSON.stringify({
+                    query: this.searchQuery,
+                    page_number: this.currentPage,
+                    page_size: this.pageSize
+                }),
             };
 
             try {
@@ -63,7 +82,11 @@ export default {
             }
         },
         goToHomePage() {
-            this.$router.push({name: 'HomePage'});
+            this.$router.push({ name: 'HomePage' });
+        },
+        handlePageChange(newPage) {
+            this.currentPage = newPage;
+            this.searchStepTwo();
         }
     },
 };
@@ -79,7 +102,6 @@ export default {
 .search-container-h3 {
     display: flex;
     align-items: center;
-    /* margin-top: -40px; */
 }
 
 .search-h3 {
