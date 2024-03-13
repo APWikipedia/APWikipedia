@@ -197,3 +197,4 @@ classifier/labels.json
 *.pkl
 node_modules/
 !package.json
+*.bin

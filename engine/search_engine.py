@@ -74,45 +74,35 @@ class SearchEngine:
         
         return processed_tokens
 
-    def mix_search(self, text: str, page_number: int = 1, page_size: int = 10) -> List[str]:
+
+    def _extract_positions(self, phrase: str, words: List[str]) -> Set[int]:
+        pos = set()
+        if phrase:
+            phrase_result = self.phrase_search(phrase)
+            if isinstance(phrase_result, set):
+                pos.update(phrase_result)
+        for word in words:
+            if word.upper() not in ["AND", "OR", "NOT"]:
+                word_positions = self.inverted_index_with_position.get(self.ps.stem(word.lower()), {})
+                pos.update(word_positions.keys())
+        return pos
+
+
+    def mix_search(self, text: str, page_number: int = 1, page_size: int = 10) -> Tuple[List[str], int]:
         """
         Special search with both operators (AND, OR, NOT) and phrases
         """
-
-        def extract_positions(phrase, words):
-            # Extract the position of a phrase or word
-            if phrase:
-                pos = set(self.phrase_search(phrase))
-            else:
-                pos = set()
-
-            for word in words:
-                if word.upper() not in ["AND", "OR", "NOT"]:
-                    stemmed_word = self.ps.stem(word.lower())
-                    if stemmed_word in self.inverted_index_with_position:
-                        pos = pos.union(set(self.inverted_index_with_position[stemmed_word].keys()))
-            return pos
-
-        result = set()
         phrases = re.findall(r"'(.*?)'", text)
         other_words = re.sub(r"'(.*?)'", "", text).split()
+        extracted_positions = [self._extract_positions(phrase, other_words) for phrase in phrases + [None] * (2 - len(phrases))]
 
-        if phrases:
-            pos1 = extract_positions(phrases[0], other_words)
-            pos2 = extract_positions(
-                phrases[1] if len(phrases) > 1 else None, other_words
-            )
+        if "AND" in text:
+            result = extracted_positions[0].intersection(extracted_positions[1]) if "AND NOT" not in text else extracted_positions[0] - extracted_positions[1]
+        elif "OR" in text:
+            result = extracted_positions[0].union(extracted_positions[1]) if "OR NOT" not in text else extracted_positions[0].union(set(self.inverted_index_with_position.keys()) - extracted_positions[1])
+        else:
+            result = set()
 
-            if "AND" in text:
-                result = (
-                    pos1.intersection(pos2) if "AND NOT" not in text else pos1 - pos2
-                )
-            elif "OR" in text:
-                result = (
-                    pos1.union(pos2)
-                    if "OR NOT" not in text
-                    else pos1.union(set(self.index.keys()) - pos2)
-                )
         start_index = (page_number - 1) * page_size
         end_index = start_index + page_size
         return list(result)[start_index:end_index], len(result)
@@ -219,8 +209,8 @@ if __name__ == "__main__":
     print(f"Load time: {load_time:.2f}s")
     # query = "income taxes"
     # query =  "#20(income, taxes)"
-    # query = '"AI algorithm" OR bayes'
-    query = "ai"
+    query = "'AI algorithm' OR bayes"
+    # query = "ai"
     # results = engine.ranked_search(query)
     results, _ = engine.execute_query(query)
     query_time = time.time()  - start_time
