@@ -1,4 +1,4 @@
-FROM node:14 as build-stage
+FROM node:lts-alpine
 
 WORKDIR /app
 
@@ -10,10 +10,9 @@ COPY . .
 
 RUN npm run build
 
-FROM nginx:stable-alpine as production-stage
+RUN npm install -g serve
 
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 8080
 
-EXPOSE 80
+CMD ["serve", "-s", "dist", "-l", "8080"]
 
-CMD ["nginx", "-g", "daemon off;"]
