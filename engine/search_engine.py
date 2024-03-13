@@ -94,8 +94,8 @@ class SearchEngine:
             return pos
 
         result = set()
-        phrases = re.findall(r"'(.*?)'", text)
-        other_words = re.sub(r"'(.*?)'", "", text).split()
+        phrases = re.findall(r'"(.*?)"', text)
+        other_words = re.sub(r'"(.*?)"', "", text).split()
 
         if phrases:
             pos1 = extract_positions(phrases[0], other_words)
@@ -111,7 +111,7 @@ class SearchEngine:
                 result = (
                     pos1.union(pos2)
                     if "OR NOT" not in text
-                    else pos1.union(set(self.index.keys()) - pos2)
+                    else pos1.union(set(self.inverted_index_with_position.keys()) - pos2)
                 )
         start_index = (page_number - 1) * page_size
         end_index = start_index + page_size
@@ -219,8 +219,8 @@ if __name__ == "__main__":
     print(f"Load time: {load_time:.2f}s")
     # query = "income taxes"
     # query =  "#20(income, taxes)"
-    # query = '"AI algorithm" OR bayes'
-    query = "ai"
+    query = '"AI algorithm" OR bayes'
+    # query = "ai"
     # results = engine.ranked_search(query)
     results, _ = engine.execute_query(query)
     query_time = time.time()  - start_time
