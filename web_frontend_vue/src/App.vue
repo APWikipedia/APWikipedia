@@ -3,6 +3,7 @@
   <!-- 使用 SearchComponent 组件 -->
   <!-- <search-component></search-component> -->
   <router-view></router-view>
+  <div id="global-autocomplete-container"></div>
 </template>
 
 
