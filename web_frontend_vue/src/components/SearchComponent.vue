@@ -63,7 +63,7 @@
               </div>
             </div>
             <label class="radio-label" :class="{ 'label-no-input': !secondQuery }">
-              {{ /\b\w+\b\s+\b\w+\b/.test(firstQuery) ? 'The first query is a phrase' : 'The first query is a word' }}
+              {{ /\b\w+\b\s+\b\w+\b/.test(secondQuery) ? 'The second query is a phrase' : 'The second query is a word' }}
             </label>
           </div>
         </div>
