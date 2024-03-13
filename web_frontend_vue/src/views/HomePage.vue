@@ -10,7 +10,7 @@ import SearchComponent from '../components/SearchComponent.vue';
 
 export default {
     components: {
-        SearchComponent
+        SearchComponent,
     },
 };
 </script>

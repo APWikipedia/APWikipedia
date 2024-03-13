@@ -29,19 +29,27 @@ export default {
             searchQuery: '',
             searchResults: [],
             searchTime: null,
-            searched: false, // 用于跟踪是否已经进行了搜索
+            searched: false,
             currentPage: 1,
-            pageSize: 10
+            pageSize: 10,
+            isAdvancedSearchActive: false, // 默认情况下高级搜索不激活
         };
     },
     components: {
         SearchComponent,
-        PaginationComponent
+        PaginationComponent,
+    },
+    computed: {
+        searchURL() {
+            return this.isAdvancedSearchActive ? 'http://127.0.0.1:5000/search' : 'http://127.0.0.1:5000/ranked_search';
+        },
     },
     watch: {
-        '$route.query.q': {
+        '$route.query': {
             immediate: true,
-            handler() {
+            handler(query) {
+                this.isAdvancedSearchActive = query.advanced === '1';
+                this.searchQuery = query.q;
                 this.searchStepTwo();
             },
         },
@@ -55,8 +63,7 @@ export default {
     // },
     methods: {
         async searchStepTwo() {
-            this.searchQuery = this.$route.query.q;
-
+            // this.searchQuery = this.$route.query.q;
             const requestOptions = {
                 method: 'POST',
                 headers: {
@@ -68,9 +75,8 @@ export default {
                     page_size: this.pageSize
                 }),
             };
-
             try {
-                const response = await fetch('http://127.0.0.1:5000/ranked_search', requestOptions);
+                const response = await fetch(this.searchURL, requestOptions);
                 const data = await response.json();
                 this.searchResults = data.results || [];
                 this.searchTime = data['search_time(Ms)'] || null;
@@ -87,7 +93,7 @@ export default {
         handlePageChange(newPage) {
             this.currentPage = newPage;
             this.searchStepTwo();
-        }
+        },
     },
 };
 </script>
@@ -101,6 +107,7 @@ export default {
 
 .search-container-h3 {
     display: flex;
+    justify-content: center;
     align-items: center;
 }
 
@@ -114,6 +121,7 @@ export default {
     background-clip: text;
     text-shadow: 0px 3px 3px rgba(255, 255, 255, 0.5);
     margin-right: 10px;
+    padding-bottom: 10px;
     cursor: pointer;
 }
 

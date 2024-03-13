@@ -12,12 +12,12 @@ const routes = [
     path: '/result',
     name: 'ResultPage',
     component: ResultPage,
-    props: (route) => ({ query: route.query.q })
+    // props: (route) => ({ query: route.query.q })
   }
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes
 });
 

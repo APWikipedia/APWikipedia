@@ -20,12 +20,12 @@ export default {
     props: {
         currentPage: Number,
         pageSize: Number,
-        totalCount: Number
+        totalCount: Number,
     },
     computed: {
         totalPages() {
             return Math.ceil(this.totalCount / this.pageSize);
-        }
+        },
     },
     methods: {
         changePage(page) {
@@ -33,8 +33,8 @@ export default {
                 this.$emit('page-changed', page);
             }
             window.scrollTo(0, 0);
-        }
-    }
+        },
+    },
 }
 </script>
 
