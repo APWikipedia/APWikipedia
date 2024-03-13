@@ -9,6 +9,14 @@
             <div v-for="result in searchResults" :key="result.url" class="search-result">
                 <h3><a :href="result.url" target="_blank" class="result-link">{{ result.title }}</a></h3>
                 <p class="result-summary">{{ result.summary }}</p>
+                <!-- 以下为Tags伪数据 -->
+                <small>
+                    Tags:
+                    <span v-for="tagWithColor in getRandomTags()" :key="tagWithColor.tag"
+                        :style="{ 'background-color': tagWithColor.color }" class="result-tag">
+                        {{ tagWithColor.tag }}
+                    </span>
+                </small>
             </div>
             <!-- <PaginationComponent :currentPage="currentPage" :pageSize="pageSize" :totalCount="searchResults.length"
                     @page-changed="handlePageChange" /> -->
@@ -32,7 +40,19 @@ export default {
             searched: false,
             currentPage: 1,
             pageSize: 10,
-            isAdvancedSearchActive: false, // 默认情况下高级搜索不激活
+            isAdvancedSearchActive: false,
+            tagsWithColors: [ //伪数据
+                { tag: "Artificial Intelligence", color: "red" },
+                { tag: "Machine Learning", color: "blue" },
+                { tag: "Data Science", color: "yellow" },
+                { tag: "Computer Vision", color: "green" },
+                { tag: "Natural Language Processing", color: "gray" },
+                { tag: "Neural Networks", color: "orange" },
+                { tag: "Big Data Analytics", color: "purple" },
+                { tag: "Computational Theory", color: "cyan" },
+                { tag: "Quantum Computing", color: "pink" },
+                { tag: "Computer Hardware", color: "black" }
+            ]
         };
     },
     components: {
@@ -94,11 +114,25 @@ export default {
             this.currentPage = newPage;
             this.searchStepTwo();
         },
+        getRandomTags() { //伪数据随即展现两个
+            let shuffledTags = [...this.tagsWithColors].sort(() => 0.5 - Math.random());
+            return shuffledTags.slice(0, 3);
+        },
     },
 };
 </script>
 
 <style>
+.result-tag { /* 伪数据 */
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  color: white;
+  display: inline-block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
 .search-results-container {
     position: absolute;
     top: 20px;
