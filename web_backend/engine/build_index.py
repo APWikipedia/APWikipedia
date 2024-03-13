@@ -25,7 +25,7 @@ def create_inverted_index(data):
     The heavyweight index will include position data for proximity queries.
     """
     lightweight_index = defaultdict(dict)  # 不包含位置信息，将存储TF-IDF值
-    heavyweight_index = defaultdict(default_dict_list) # 包含位置信息
+    heavyweight_index = {}  # 包含位置信息，手动管理
     doc_frequency = defaultdict(int)  # 用于计算DF
     doc_lengths = defaultdict(int)  # 存储每个文档的长度
 
@@ -37,10 +37,14 @@ def create_inverted_index(data):
         seen_tokens = set()  # Track tokens seen in this document to correctly compute DF
         for position, token in enumerate(tokens):
             # Update heavyweight index
-            if file_name not in heavyweight_index[token]:
-                heavyweight_index[token][file_name] = [position]
+            if token not in heavyweight_index:
+                heavyweight_index[token] = {file_name: [position]}
             else:
-                heavyweight_index[token][file_name].append(position - heavyweight_index[token][file_name][-1])
+                if file_name not in heavyweight_index[token]:
+                    heavyweight_index[token][file_name] = [position]
+                else:
+                    # Subtract the last position to store the gap, not the absolute position
+                    heavyweight_index[token][file_name].append(position - heavyweight_index[token][file_name][-1])
 
             # Ensure each token is only counted once for DF per document
             if token not in seen_tokens:
@@ -59,6 +63,7 @@ def create_inverted_index(data):
             lightweight_index[token][file_name] = tf_idf
 
     return lightweight_index, heavyweight_index
+
 
 
 def save_inverted_index(lightweight_index, heavyweight_index, lw_output_file, hw_output_file):
@@ -87,7 +92,7 @@ def save_inverted_index_pickle(lightweight_index, heavyweight_index, lw_output_f
         pickle.dump(heavyweight_index, file)
 
 if __name__ == "__main__":        
-    input_dir = 'processed_data/'         
+    input_dir = '../processed_data/'         
     lw_output_file = 'engine/lightweight_index.pkl'
     hw_output_file = 'engine/heavyweight_index.pkl'
     data = load_data(input_dir)
