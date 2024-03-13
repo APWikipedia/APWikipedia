@@ -123,14 +123,15 @@ export default {
 </script>
 
 <style>
-.result-tag { /* 伪数据 */
-  padding: 5px 10px;
-  margin-right: 5px;
-  border-radius: 5px;
-  color: white;
-  display: inline-block;
-  margin-bottom: 5px;
-  font-weight: bold;
+.result-tag {
+    /* 伪数据 */
+    padding: 5px 10px;
+    margin-right: 5px;
+    border-radius: 5px;
+    color: white;
+    display: inline-block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
 .search-results-container {
@@ -143,6 +144,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    border-bottom: 2px solid #DADCE0;
+    margin-bottom: 10px;
+    padding-bottom: 15px;
 }
 
 .search-h3 {
