@@ -3,7 +3,7 @@ from nltk.tokenize import word_tokenize
 import nltk
 nltk.download('punkt')
 
-with open('your_corpus.txt', 'r', encoding='utf-8') as file:
+with open('abstracts.wiki.txt', 'r', encoding='utf-8') as file:
     corpus = file.readlines()
 
 # 对文本进行分词处理
@@ -16,3 +16,4 @@ model = Word2Vec(sentences=tokenized_corpus, vector_size=100, window=5, min_coun
 
 # 保存训练好的模型
 model.save('word2vec_model.bin')
+print(model.wv.most_similar('daisy'))
