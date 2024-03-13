@@ -8,10 +8,6 @@ from typing import List, Set, Tuple
 
 from nltk.stem import PorterStemmer
 
-from collections import defaultdict
-def default_dict_list():
-    return defaultdict(list)
-
 
 class SearchEngine:
     def __init__(self, index_file_with_tfidf: str, index_file_with_position: str) -> None:
@@ -19,7 +15,7 @@ class SearchEngine:
         self.inverted_index_with_position = self.load_index(index_file_with_position)
         self.ps = PorterStemmer()
         self.stop_words = set(
-            open("./preprocess/ttds_2023_english_stop_words.txt", encoding="utf-8")
+            open("./engine/ttds_2023_english_stop_words.txt", encoding="utf-8")
             .read()
             .splitlines()
         )
