@@ -10,19 +10,11 @@
             <div v-for="result in searchResults" :key="result.url" class="search-result">
                 <h3><a :href="result.url" target="_blank" class="result-link">{{ result.title }}</a></h3>
                 <p class="result-summary">{{ result.summary }}</p>
-                <!-- <small>Tags: <span class="result-tag">{{ result.tag }}</span></small> -->
-                <!-- 以下为Tags伪数据 -->
-                <small>
-                    Tags:
-                    <span v-for="tagWithColor in getRandomTags()" :key="tagWithColor.tag"
-                        :style="{ 'background-color': tagWithColor.color }" class="result-tag">
-                        {{ tagWithColor.tag }}
-                    </span>
-                </small>
+                <small>Tags: <span v-for="tag in result.tags" :key="tag"
+                        :style="{ 'background-color': getTagColor(tag), color: '#fff' }" class="result-tag">{{ tag
+                        }}</span></small>
             </div>
-            <!-- <PaginationComponent :currentPage="currentPage" :pageSize="pageSize" :totalCount="searchResults.length"
-                    @page-changed="handlePageChange" /> -->
-            <PaginationComponent :currentPage="currentPage" :pageSize="pageSize" :totalCount=50
+            <PaginationComponent :currentPage="currentPage" :pageSize="pageSize" :totalCount="searchLength"
                 @page-changed="handlePageChange" />
         </div>
         <div v-else-if="searched" class="no-results">No results found.</div>
@@ -39,22 +31,15 @@ export default {
             searchQuery: '',
             searchResults: [],
             searchTime: null,
+            searchLength: 0,
             searched: false,
             currentPage: 1,
             pageSize: 10,
             isAdvancedSearchActive: false,
-            tagsWithColors: [ //伪数据
-                { tag: "Artificial Intelligence", color: "red" },
-                { tag: "Machine Learning", color: "blue" },
-                { tag: "Data Science", color: "yellow" },
-                { tag: "Computer Vision", color: "green" },
-                { tag: "Natural Language Processing", color: "gray" },
-                { tag: "Neural Networks", color: "orange" },
-                { tag: "Big Data Analytics", color: "purple" },
-                { tag: "Computational Theory", color: "cyan" },
-                { tag: "Quantum Computing", color: "pink" },
-                { tag: "Computer Hardware", color: "black" }
-            ]
+            tagColorCache: {}, 
+            baseHue: 0, 
+            hueIncrement: 25, 
+            colorIndex: 0, 
         };
     },
     components: {
@@ -76,16 +61,8 @@ export default {
             },
         },
     },
-    // computed: {
-    //     currentItems() {
-    //         const start = (this.currentPage - 1) * this.pageSize;
-    //         const end = start + this.pageSize;
-    //         return this.items.slice(start, end);
-    //     }
-    // },
     methods: {
         async searchStepTwo() {
-            // this.searchQuery = this.$route.query.q;
             const requestOptions = {
                 method: 'POST',
                 headers: {
@@ -102,6 +79,7 @@ export default {
                 const data = await response.json();
                 this.searchResults = data.results || [];
                 this.searchTime = data['search_time(Ms)'] || null;
+                this.searchLength = data['total length'] || 0;
             } catch (error) {
                 console.error("Request Error:", error);
                 this.searchResults = [];
@@ -116,9 +94,19 @@ export default {
             this.currentPage = newPage;
             this.searchStepTwo();
         },
-        getRandomTags() { //伪数据随即展现两个
-            let shuffledTags = [...this.tagsWithColors].sort(() => 0.5 - Math.random());
-            return shuffledTags.slice(0, 3);
+        getTagColor(tag) {
+            if (!this.tagColorCache[tag]) {
+                const colors = [
+                    { hue: (0 + 137 * this.colorIndex) % 360, saturation: 70, lightness: 60 },
+                    { hue: (55 + 137 * this.colorIndex) % 360, saturation: 55, lightness: 50 },
+                    { hue: (120 + 137 * this.colorIndex) % 360, saturation: 45, lightness: 70 },
+                ];
+                const color = colors[this.colorIndex % colors.length];
+                const hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
+                this.tagColorCache[tag] = hsl;
+                this.colorIndex++; 
+            }
+            return this.tagColorCache[tag];
         },
     },
 };
@@ -126,11 +114,11 @@ export default {
 
 <style>
 .result-tag {
-    /* 伪数据 */
     padding: 5px 10px;
     margin-right: 5px;
+    border: 1px solid #DADCE0;
     border-radius: 5px;
-    color: white;
+    color: black;
     display: inline-block;
     margin-bottom: 5px;
     font-weight: bold;
@@ -138,32 +126,23 @@ export default {
 
 .custom-hr {
     border: 0;
-    /* 移除默认边框 */
     height: 1px;
-    /* 设置线的高度 */
     width: 100%;
     background-color: #DADCE0;
-    /* 设置线的颜色 */
     margin-top: 10px;
-    /* 设置上边距 */
     margin-bottom: 10px;
-    /* 设置下边距 */
 }
 
 .search-results-container {
     position: absolute;
     top: 20px;
     left: 15px;
-    /* width: 100%; */
 }
 
 .search-container-h3 {
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    /* border-bottom: 2px solid #DADCE0;
-    margin-bottom: 10px;
-    padding-bottom: 15px; */
 }
 
 .search-h3 {
@@ -186,7 +165,6 @@ export default {
 }
 
 .search-result {
-    /* border-bottom: 1px solid #eee; */
     padding: 10px 0;
 }
 
@@ -202,6 +180,7 @@ export default {
 
 .result-link {
     color: #1e88e5;
+    font-size: 23px;
     text-decoration: none;
 }
 

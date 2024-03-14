@@ -12,7 +12,6 @@ const routes = [
     path: '/result',
     name: 'ResultPage',
     component: ResultPage,
-    // props: (route) => ({ query: route.query.q })
   }
 ];
 

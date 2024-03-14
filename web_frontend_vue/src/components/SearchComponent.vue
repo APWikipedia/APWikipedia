@@ -118,13 +118,12 @@ export default {
       currentFocusedInput: '',
       dropdownPosition: { top: 0, left: 0 },
       aboutToLoseFocus: false,
-      isExpanded: true, // 默认展开
+      isExpanded: true,
       isButtonClicked: false,
     };
   },
   computed: {
     buttonStyle() {
-      // 根据按钮的点击状态返回相应的样式对象
       return {
         backgroundColor: this.isButtonClicked ? 'white' : '#2c3e50',
         color: this.isButtonClicked ? '#2c3e50' : 'white',
@@ -198,7 +197,7 @@ export default {
       this.$router.push({
         name: 'ResultPage',
         query: {
-          q: this.fullSearchQuery.replace(/"/g, "'"), //将双引号改为单引号
+          q: this.fullSearchQuery.replace(/"/g, "'"),
           advanced: this.isAdvancedSearchActive ? '1' : '0'
         }
       });
@@ -229,52 +228,54 @@ export default {
         this.fullSearchQuery = `#${this.proximityDistance}(${firstQueryFormatted}, ${secondQueryFormatted})`.trim();
       }
     },
-
-    //新增拼写检查和自动完成 - 请求后端 - 勿删
-    // async fetchSpellCheckQuery() {
-    //   if (!this.fullSearchQuery) return;
-    //   try {
-    //     const response = await fetch(`YOUR_SPELLCHECK_BACKEND_URL?query=${this.fullSearchQuery}`);
-    //     if (response.ok) {
-    //       const text = await response.text();
-    //       this.spellCheckedQuery = text;
-    //     }
-    //   } catch (error) {
-    //     console.error('Spell check error:', error);
-    //   }
-    // },
-    // async fetchAutocompleteResults() {
-    //   if (!this.fullSearchQuery) return;
-    //   try {
-    //     const response = await fetch(`YOUR_AUTOCOMPLETE_BACKEND_URL?query=${this.fullSearchQuery}`);
-    //     if (response.ok) {
-    //       const suggestions = await response.json();
-    //       this.autocompleteResults = suggestions;
-    //     }
-    //   } catch (error) {
-    //     console.error('Autocomplete error:', error);
-    //   }
-    // },
-
-    //伪数据
-    fetchSpellCheckQuery() {
-      // 假设这是从拼写检查API返回的数据
-      if (this.fullSearchQuery.toLowerCase().includes('teh')) {
-        this.spellCheckedQuery = this.fullSearchQuery.replace('teh', 'the');
-      } else {
-        this.spellCheckedQuery = ''; // 如果没有拼写错误，不显示建议
+    async fetchSpellCheckQuery() {
+      if (!this.fullSearchQuery) return;
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: this.fullSearchQuery,
+        }),
+      };
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/spell_check`, requestOptions);
+        if (response.ok) {
+          const result = await response.json();
+          this.spellCheckedQuery = result.spell_checked_query;
+        }
+      } catch (error) {
+        console.error('Spell check error:', error);
       }
     },
-    //伪数据
-    fetchAutocompleteResults() {
-      // 假设这是从自动完成API返回的数据
-      this.autocompleteResults = [
-        `${this.fullSearchQuery} suggestion 1`,
-        `${this.fullSearchQuery} suggestion 2`,
-        `${this.fullSearchQuery} suggestion 3`,
-      ];
-    },
+    async fetchAutocompleteResults() {
+      if (!this.fullSearchQuery) return;
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: this.fullSearchQuery,
+        }),
+      };
+      const apiUrl = this.fullSearchQuery.includes(' ')
+        ? `http://127.0.0.1:5000/query_expansion`
+        : `http://127.0.0.1:5000/word_expansion`;
 
+      try {
+        const response = await fetch(apiUrl, requestOptions);
+        if (response.ok) {
+          const result = await response.json();
+          this.autocompleteResults = this.fullSearchQuery.includes(' ')
+            ? result.expanded_query
+            : result.expanded_words;
+        }
+      } catch (error) {
+        console.error('Autocomplete error:', error);
+      }
+    },
     updateQuery(newQuery) {
       console.log(newQuery);
       console.log(this.currentFocusedInput);

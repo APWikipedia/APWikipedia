@@ -35,7 +35,7 @@ def save_metadata(metadata, output_file):
         json.dump(metadata, file, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
-    input_dir = 'data/'  # 原始数据目录
+    input_dir = '../data/'  # 原始数据目录
     tags_file = 'engine/labels.json'  # 标签数据文件
     output_file = 'engine/metadata.json'  # 元数据输出文件
     metadata = build_metadata(input_dir, tags_file)
