@@ -249,31 +249,6 @@ export default {
         console.error('Spell check error:', error);
       }
     },
-
-
-
-    // async fetchAutocompleteResults() {
-    //   if (!this.fullSearchQuery) return;
-    //   const requestOptions = {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       query: this.fullSearchQuery,
-    //     }),
-    //   };
-    //   try {
-    //     const response = await fetch(`http://127.0.0.1:5000/word_expansion`, requestOptions);
-    //     if (response.ok) {
-    //       const result2 = await response.json();
-    //       this.autocompleteResults = result2.expanded_words;
-    //     }
-    //   } catch (error) {
-    //     console.error('Autocomplete error:', error);
-    //   }
-    // },
-
     async fetchAutocompleteResults() {
       if (!this.fullSearchQuery) return;
       const lastWord = this.fullSearchQuery.trim().split(' ').pop();
@@ -296,21 +271,6 @@ export default {
         console.error('Autocomplete error:', error);
       }
     },
-
-
-    // fetchAutocompleteResults() {
-    //   // 假设这是从自动完成API返回的数据
-    //   this.autocompleteResults = [
-    //     `${this.fullSearchQuery} suggestion 1`,
-    //     `${this.fullSearchQuery} suggestion 2`,
-    //     `${this.fullSearchQuery} suggestion 3`,
-    //   ];
-    // },
-
-
-
-
-
     updateQuery(newQuery) {
       console.log(newQuery);
       console.log(this.currentFocusedInput);
