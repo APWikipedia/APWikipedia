@@ -198,3 +198,4 @@ classifier/labels.json
 node_modules/
 !package.json
 *.bin
+*.npy
