@@ -69,7 +69,7 @@ class QueryExpansionResource(Resource):
 class WordExpansionResource(Resource):
     def post(self):
         data = request.get_json()
-        word = data.get('word')
+        word = data.get('query')
         if word:
             expanded_words = current_app.spell_checker.word_expansion(word, k=3)
             return {"expanded_words": expanded_words}, 200
