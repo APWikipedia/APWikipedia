@@ -4,11 +4,13 @@
             <h3 @click="goToHomePage" class="search-h3">APWikipedia</h3>
             <SearchComponent />
         </div>
+        <hr class="custom-hr" />
         <div v-if="searchResults.length > 0" class="results-container">
             <div v-if="searchTime !== null" class="search-time">Search Time: {{ searchTime }} ms</div>
             <div v-for="result in searchResults" :key="result.url" class="search-result">
                 <h3><a :href="result.url" target="_blank" class="result-link">{{ result.title }}</a></h3>
                 <p class="result-summary">{{ result.summary }}</p>
+                <!-- <small>Tags: <span class="result-tag">{{ result.tag }}</span></small> -->
                 <!-- 以下为Tags伪数据 -->
                 <small>
                     Tags:
@@ -134,19 +136,34 @@ export default {
     font-weight: bold;
 }
 
+.custom-hr {
+    border: 0;
+    /* 移除默认边框 */
+    height: 1px;
+    /* 设置线的高度 */
+    width: 100%;
+    background-color: #DADCE0;
+    /* 设置线的颜色 */
+    margin-top: 10px;
+    /* 设置上边距 */
+    margin-bottom: 10px;
+    /* 设置下边距 */
+}
+
 .search-results-container {
     position: absolute;
     top: 20px;
     left: 15px;
+    /* width: 100%; */
 }
 
 .search-container-h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-bottom: 2px solid #DADCE0;
+    /* border-bottom: 2px solid #DADCE0;
     margin-bottom: 10px;
-    padding-bottom: 15px;
+    padding-bottom: 15px; */
 }
 
 .search-h3 {

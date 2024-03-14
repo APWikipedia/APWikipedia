@@ -4,12 +4,14 @@
       <div class="search-input-button">
         <input type="text" v-model="fullSearchQuery" @keyup.enter="searchStepOne"
           @input="fetchSpellCheckQuery(); fetchAutocompleteResults();"
-          @focus="currentFocusedInput = 'fullSearchQuery'; isDropdownVisible = true; updateDropdownPosition($event)"
-          @blur="hideDropdown; isDropdownVisible = false" placeholder="Enter the search query..."
-          class="search-input" />
+          @focus="currentFocusedInput = 'fullSearchQuery'; isDropdownVisible = true;; handleFocus(); updateDropdownPosition($event)"
+          @blur="hideDropdown" placeholder="Enter the search query..." class="search-input" />
         <button @click="searchStepOne" class="search-button"></button>
       </div>
-      <button @click="toggle" class="advanced-search-button">Advanced<br>Search</button>
+      <button @click="toggle" :style="buttonStyle" class="advanced-search-button">
+        <span v-if="isAdvancedSearchActive">▼</span>
+        <span v-else>Advanced <br> Search</span>
+      </button>
     </div>
     <div class="autocomplete-container" v-show="isDropdownVisible" ref="autocompleteContainer">
       <ul v-if="isDropdownVisible && (spellCheckedQuery || autocompleteResults.length)" class="autocomplete-dropdown">
@@ -32,12 +34,12 @@
             <div class="form-group-child">
               <input class="form-group-child-input" type="text" v-model="firstQuery"
                 placeholder="Input the first query..." required=""
-                @focus="currentFocusedInput = 'firstQuery'; isDropdownVisible = true; updateDropdownPosition($event)"
-                @blur="hideDropdown; isDropdownVisible = false">
+                @focus="currentFocusedInput = 'firstQuery'; isDropdownVisible = true;; handleFocus(); updateDropdownPosition($event)"
+                @blur="hideDropdown">
               <span class="form-group-child-input-bordert"></span>
             </div>
             <template v-if="selectedRadio === 'radio1'">
-              <div class="form-group-child">
+              <div class="form-group-child" v-show="isExpanded">
                 <select v-model="selectedOperator" class="form-group-child-input">
                   <option value="">Choose the operator</option>
                   <option value="AND">AND</option>
@@ -49,25 +51,28 @@
               </div>
             </template>
             <template v-else>
-              <div class="form-group-child">
+              <div class="form-group-child" v-show="isExpanded">
                 <input class="form-group-child-input" type="number" v-model="proximityDistance"
                   placeholder="Input the distance... (only numbers)" required="">
                 <span class="form-group-child-input-bordert"></span>
               </div>
             </template>
-            <div class="form-group-child">
+            <div class="form-group-child" v-show="isExpanded">
               <input class="form-group-child-input" type="text" v-model="secondQuery"
                 placeholder="Input the second query..." required=""
-                @focus="currentFocusedInput = 'secondQuery'; isDropdownVisible = true; updateDropdownPosition($event)"
-                @blur="hideDropdown; isDropdownVisible = false">
+                @focus="currentFocusedInput = 'secondQuery'; isDropdownVisible = true;; handleFocus(); updateDropdownPosition($event)"
+                @blur="hideDropdown">
               <span class="form-group-child-input-bordert"></span>
             </div>
+            <button @click="toggleExpand" class="plus-minus-button">{{ isExpanded ? '&ndash; Remove a line' :
+          '+ Add a line' }}</button>
           </div>
           <div class="form-group">
             <label class="radio-label" :class="{ 'label-no-input': !firstQuery }">
-              {{ /\b\w+\b\s+\b\w+\b/.test(firstQuery) ? 'The first query is a phrase' : 'The first query is a word' }}
+              {{ /\b\w+\b\s+\b\w+\b/.test(firstQuery) ? 'The first query is a phrase' : 'The first query is a word'
+              }}
             </label>
-            <div class="radio-buttons-container">
+            <div class="radio-buttons-container" v-show="isExpanded">
               <div class="radio-button">
                 <input v-model="selectedRadio" id="radio1" class="radio-button-input" type="radio" value="radio1">
                 <label for="radio1" class="radio-button-label">
@@ -87,6 +92,7 @@
               {{ /\b\w+\b\s+\b\w+\b/.test(secondQuery) ? 'The second query is a phrase' : 'The second query is a word'
               }}
             </label>
+            <button class="invisible-button"></button>
           </div>
         </div>
       </div>
@@ -111,7 +117,19 @@ export default {
       isDropdownVisible: false,
       currentFocusedInput: '',
       dropdownPosition: { top: 0, left: 0 },
+      aboutToLoseFocus: false,
+      isExpanded: true, // 默认展开
+      isButtonClicked: false,
     };
+  },
+  computed: {
+    buttonStyle() {
+      // 根据按钮的点击状态返回相应的样式对象
+      return {
+        backgroundColor: this.isButtonClicked ? 'white' : '#2c3e50',
+        color: this.isButtonClicked ? '#2c3e50' : 'white',
+      };
+    },
   },
   watch: {
     firstQuery() {
@@ -180,7 +198,7 @@ export default {
       this.$router.push({
         name: 'ResultPage',
         query: {
-          q: this.fullSearchQuery,
+          q: this.fullSearchQuery.replace(/"/g, "'"), //将双引号改为单引号
           advanced: this.isAdvancedSearchActive ? '1' : '0'
         }
       });
@@ -188,6 +206,7 @@ export default {
     toggle() {
       this.isOpen = !this.isOpen;
       this.isAdvancedSearchActive = !this.isAdvancedSearchActive;
+      this.isButtonClicked = !this.isButtonClicked;
       if (!this.isOpen) {
         this.firstQuery = '';
         this.secondQuery = '';
@@ -257,6 +276,8 @@ export default {
     },
 
     updateQuery(newQuery) {
+      console.log(newQuery);
+      console.log(this.currentFocusedInput);
       switch (this.currentFocusedInput) {
         case 'fullSearchQuery':
           this.fullSearchQuery = newQuery;
@@ -272,33 +293,65 @@ export default {
       }
       this.isDropdownVisible = false;
     },
-    // hideDropdown() {
-    //   setTimeout(() => {
-    //     this.isDropdownVisible = false;
-    //   }, 200);
-    // },
+    hideDropdown() {
+      this.aboutToLoseFocus = true;
+      setTimeout(() => {
+        if (this.aboutToLoseFocus) {
+          this.isDropdownVisible = false;
+        }
+      }, 200);
+    },
+    handleFocus() {
+      this.aboutToLoseFocus = false;
+      this.isDropdownVisible = true;
+    },
     updateDropdownPosition(event) {
-      const inputElement = event.target; // 获取当前聚焦的输入元素
-      const autocompleteContainer = this.$refs.autocompleteContainer; // 通过 ref 获取 autocomplete 容器
-
-      // 获取 panel-header 元素，以便可以将 autocomplete 容器移动回此位置
+      const inputElement = event.target;
+      const autocompleteContainer = this.$refs.autocompleteContainer;
       const panelHeader = this.$refs.panelHeader;
-
       if (this.currentFocusedInput === 'fullSearchQuery' && panelHeader && autocompleteContainer) {
-        // 如果是 fullSearchQuery 输入，将 autocomplete 容器移动到 panel-header 元素之后
         panelHeader.insertAdjacentElement('afterend', autocompleteContainer);
       } else if (inputElement && autocompleteContainer) {
-        // 对于 firstQuery 和 secondQuery 输入，将 autocomplete 容器移动到 input 元素之后
         inputElement.insertAdjacentElement('afterend', autocompleteContainer);
       }
+    },
+    toggleExpand() {
+      this.isExpanded = !this.isExpanded;
     },
   },
 };
 </script>
 
 <style>
+.plus-minus-button {
+  height: 40px;
+  background-color: #eee;
+  color: #2c3e50;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.plus-minus-button:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.1);
+}
+
+.plus-minus-button:focus {
+  outline: none;
+}
+
+.invisible-button {
+  height: 40px;
+  background-color: #eee;
+  border: none;
+}
+
 .autocomplete-container {
-  /* position: relative; */
   position: absolute;
   text-align: left;
   z-index: 1000;
@@ -330,16 +383,18 @@ export default {
 .search-input {
   width: 325px;
   padding: 10px;
+  font-size: 16px;
   border: 5px solid white;
   border-radius: 30px;
 }
 
 .search-button {
-  background-image: url('../assets/search.png');
+  background-image: url('../assets/icons8-search-100.png');
   background-color: white;
   background-size: cover;
   background-position: center;
   border: none;
+  margin-left: 50px;
   width: 30px;
   height: 30px;
   cursor: pointer;
@@ -360,11 +415,13 @@ export default {
   background-color: #2c3e50;
   color: white;
   margin-left: 10px;
-  height: 100%;
+  width: 99.2875px;
+  height: 52px;
   border: none;
   border-radius: 30px;
   white-space: normal;
   cursor: pointer;
+  transition: background-color 0.4s, color 0.4s;
 }
 
 .form-group-child {
