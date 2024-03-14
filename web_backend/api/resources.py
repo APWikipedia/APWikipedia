@@ -53,9 +53,8 @@ class SpellCheckerResouce(Resource):
         data = request.get_json()
         query = data.get('query')
         if query:
-            pass
-            # spell_checked_query = current_app.spell_checker.spell_check(query)
-            # return {"spell_checked_query": spell_checked_query}, 200
+            spell_checked_query = current_app.spell_checker.spell_check(query)
+            return {"spell_checked_query": spell_checked_query}, 200
         return {"spell_checked_query": ""}, 200
     
 class QueryExpansionResource(Resource):
@@ -63,7 +62,15 @@ class QueryExpansionResource(Resource):
         data = request.get_json()
         query = data.get('query')
         if query:
-            pass
-            # expanded_query = current_app.spell_checker.spell_check(query)
-            # return {"expanded_query": expanded_query}, 200
+            expanded_query = current_app.spell_checker.query_expansion(query, k=3)
+            return {"expanded_query": expanded_query}, 200
         return {"expanded_query": ""}, 200
+    
+class WordExpansionResource(Resource):
+    def post(self):
+        data = request.get_json()
+        word = data.get('query')
+        if word:
+            expanded_words = current_app.spell_checker.word_expansion(word, k=3)
+            return {"expanded_words": expanded_words}, 200
+        return {"expanded_words": ""}, 200
