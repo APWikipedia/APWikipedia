@@ -4,4 +4,3 @@ Flask_RESTful==0.3.10
 gensim==4.3.2
 nltk==3.8.1
 pyspellchecker==0.8.1
-spellchecker==0.4

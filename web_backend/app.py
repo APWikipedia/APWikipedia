@@ -8,9 +8,9 @@ import sys
 from flask import Flask, current_app
 from flask_restful import Api
 from flask_cors import CORS
-from api.resources import SearchResource, RankedSearchResource, SpellCheckerResouce, QueryExpansionResource
+from api.resources import SearchResource, RankedSearchResource, SpellCheckerResouce, QueryExpansionResource, WordExpansionResource
 from engine.search_engine import SearchEngine
-#from spell_check.spell_checker import Spell_Checker
+from spell_check.spell_checker import SpellExpansion
 import json
 
 from collections import defaultdict
@@ -30,13 +30,14 @@ def load_metadata(metadata_file):
 # 初始化 SearchEngine 实例并保存为全局变量
 app.search_engine = SearchEngine("./engine/lightweight_index.pkl", "./engine/heavyweight_index.pkl")
 app.metadata = load_metadata('./engine/metadata.json')
-# app.spell_checker = Spell_Checker()
+app.spell_checker = SpellExpansion()
 
 
 api.add_resource(SearchResource, '/search')
 api.add_resource(RankedSearchResource, '/ranked_search')
-# api.add_resource(SpellCheckerResouce, '/spell_check')
-# api.add_resource(QueryExpansionResource, '/query_expansion')
+api.add_resource(SpellCheckerResouce, '/spell_check')
+api.add_resource(QueryExpansionResource, '/query_expansion')
+api.add_resource(WordExpansionResource, '/word_expansion')
 
 
 if __name__ == '__main__':
