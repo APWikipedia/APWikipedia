@@ -15,13 +15,13 @@
     </div>
     <div class="autocomplete-container" v-show="isDropdownVisible" ref="autocompleteContainer">
       <ul v-if="isDropdownVisible && (spellCheckedQuery || autocompleteResults.length)" class="autocomplete-dropdown">
-        <li v-if="spellCheckedQuery && spellCheckedQuery !== query">
-          <a href="#" @click.prevent="updateQuery(spellCheckedQuery)">
+        <li v-if="spellCheckedQuery && spellCheckedQuery !== fullSearchQuery">
+          <a href="#" @click.prevent="updateQuery1(spellCheckedQuery)">
             <em>Did you mean:</em> {{ spellCheckedQuery }}
           </a>
         </li>
         <li v-for="(item, index) in autocompleteResults" :key="index">
-          <a href="#" @click.prevent="updateQuery(item)">
+          <a href="#" @click.prevent="updateQuery2(item)">
             {{ this.fullSearchQuery + " " + item }}
           </a>
         </li>
@@ -191,14 +191,14 @@ export default {
   methods: {
     searchStepOne() {
       if (this.fullSearchQuery.trim() === '') {
-        alert('The search query cannot be empty');
         return;
       }
+      this.$emit('search-initiated', 1);
       this.$router.push({
         name: 'ResultPage',
         query: {
           q: this.fullSearchQuery.replace(/"/g, "'"),
-          advanced: this.isAdvancedSearchActive ? '1' : '0'
+          advanced: this.isAdvancedSearchActive ? '1' : '0',
         }
       });
     },
@@ -271,9 +271,7 @@ export default {
         console.error('Autocomplete error:', error);
       }
     },
-    updateQuery(newQuery) {
-      console.log(newQuery);
-      console.log(this.currentFocusedInput);
+    updateQuery1(newQuery) {
       switch (this.currentFocusedInput) {
         case 'fullSearchQuery':
           this.fullSearchQuery = newQuery;
@@ -283,6 +281,22 @@ export default {
           break;
         case 'secondQuery':
           this.secondQuery = newQuery;
+          break;
+        default:
+          console.log("No input field is currently focused.");
+      }
+      this.isDropdownVisible = false;
+    },
+    updateQuery2(newQuery) {
+      switch (this.currentFocusedInput) {
+        case 'fullSearchQuery':
+          this.fullSearchQuery = this.fullSearchQuery + " " + newQuery;
+          break;
+        case 'firstQuery':
+          this.fullSearchQuery = this.fullSearchQuery + " " + newQuery;
+          break;
+        case 'secondQuery':
+          this.fullSearchQuery = this.fullSearchQuery + " " + newQuery;
           break;
         default:
           console.log("No input field is currently focused.");
