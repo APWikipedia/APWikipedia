@@ -49,7 +49,7 @@ export default {
         changePage(page) {
             if (page > 0 && page <= this.totalPages) {
                 this.$emit('page-changed', page);
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
             }
         },
         jumpToPage() {

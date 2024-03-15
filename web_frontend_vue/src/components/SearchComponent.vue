@@ -206,6 +206,7 @@ export default {
           advanced: this.isAdvancedSearchActive ? '1' : '0',
         }
       });
+      this.toggle();
     },
     toggle() {
       this.isOpen = !this.isOpen;

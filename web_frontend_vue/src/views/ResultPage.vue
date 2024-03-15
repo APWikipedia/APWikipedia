@@ -88,6 +88,7 @@ export default {
                 this.searchResults = data.results || [];
                 this.searchTime = data['search_time(Ms)'] || null;
                 this.searchLength = data['total length'] || 0;
+                window.scrollTo(0, 0);
             } catch (error) {
                 console.error("Request Error:", error);
                 this.searchResults = [];
