@@ -1,12 +1,12 @@
 <template>
-    <div class="search-results-container">
-        <div class="search-container-h3">
+    <div class="search-results-container" ref="searchResultsContainer">
+        <div class="search-container-h3" ref="searchContainerH3">
             <h3 @click="goToHomePage" class="search-h3">APWikipedia</h3>
-            <SearchComponent />
+            <SearchComponent @search-initiated="handleSearchInitiated" />
         </div>
-        <hr class="custom-hr" />
+        <!-- <hr class="custom-hr" /> -->
         <div v-if="searchResults.length > 0" class="results-container">
-            <div v-if="searchTime !== null" class="search-time">Search Time: {{ searchTime }} ms</div>
+            <div v-if="searchTime !== null && searchLength !== null" class="search-time">{{ searchLength}} results ({{ searchTime }} ms) </div>
             <div v-for="result in searchResults" :key="result.url" class="search-result">
                 <h3><a :href="result.url" target="_blank" class="result-link">{{ result.title }}</a></h3>
                 <p class="result-summary">{{ result.summary }}</p>
@@ -36,10 +36,10 @@ export default {
             currentPage: 1,
             pageSize: 10,
             isAdvancedSearchActive: false,
-            tagColorCache: {}, 
-            baseHue: 0, 
-            hueIncrement: 25, 
-            colorIndex: 0, 
+            tagColorCache: {},
+            baseHue: 0,
+            hueIncrement: 25,
+            colorIndex: 0,
         };
     },
     components: {
@@ -48,7 +48,7 @@ export default {
     },
     computed: {
         searchURL() {
-            return this.isAdvancedSearchActive ? 'http://127.0.0.1:5000/search' : 'http://127.0.0.1:5000/ranked_search';
+            return this.isAdvancedSearchActive ? '/search' : '/ranked_search';
         },
     },
     watch: {
@@ -60,6 +60,13 @@ export default {
                 this.searchStepTwo();
             },
         },
+    },
+    mounted() {
+        this.adjustPaddingTop();
+        window.addEventListener('resize', this.adjustPaddingTop);
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.adjustPaddingTop);
     },
     methods: {
         async searchStepTwo() {
@@ -104,10 +111,24 @@ export default {
                 const color = colors[this.colorIndex % colors.length];
                 const hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
                 this.tagColorCache[tag] = hsl;
-                this.colorIndex++; 
+                this.colorIndex++;
             }
             return this.tagColorCache[tag];
         },
+        handleSearchInitiated(page) {
+            this.currentPage = page;
+            this.searchStepTwo();
+        },
+        adjustPaddingTop() {
+            const searchContainer = this.$refs.searchContainerH3;
+            if (searchContainer) {
+                const height = searchContainer.offsetHeight;
+                const searchResultsContainer = this.$refs.searchResultsContainer;
+                if (searchResultsContainer) {
+                    searchResultsContainer.style.paddingTop = `${height}px`;
+                }
+            }
+        }
     },
 };
 </script>
@@ -143,6 +164,16 @@ export default {
     display: flex;
     justify-content: start;
     align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding-left: 15px;
+    padding-top: 20px;
+    z-index: 1000;
+    background-color: white;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .search-h3 {
