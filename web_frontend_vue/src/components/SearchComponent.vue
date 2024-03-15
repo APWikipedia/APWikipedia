@@ -155,13 +155,16 @@ export default {
     },
 
     fullSearchQuery(newVal) {
+
+      // this.updateFirstQuery();
+      // this.updateSecondQuery();
+
       if (!this.fullSearchQuery) {
         this.spellCheckedQuery = '';
         this.autocompleteResults = [];
         return;
       }
-      this.updateFirstQuery();
-      this.updateSecondQuery();
+
       this.fetchSpellCheckQuery();
       this.fetchAutocompleteResults();
 
@@ -226,20 +229,28 @@ export default {
         this.fullSearchQuery = `#${this.proximityDistance}(${firstQueryFormatted}, ${secondQueryFormatted})`.trim();
       }
     },
-    updateFirstQuery() {
-      if (this.selectedRadio === 'radio1') {
-        this.firstQuery = this.fullSearchQuery.split(' ')[0] || this.firstQuery;
-      } else {
-        this.firstQuery = (this.fullSearchQuery.slice(3, -1).split(',')[0] || this.firstQuery).trim();
-      }
-    },
-    updateSecondQuery() {
-      if (this.selectedRadio === 'radio1') {
-        this.secondQuery = this.fullSearchQuery.split(' ')[2] || this.secondQuery;
-      } else {
-        this.secondQuery = (this.fullSearchQuery.slice(3, -1).split(',')[1] || this.secondQuery).trim();
-      }
-    },
+    // updateFirstQuery() {
+    //   if (this.selectedRadio === 'radio1') {
+    //     if (this.fullSearchQuery) {
+    //       this.firstQuery = this.fullSearchQuery.split(' ')[0] || this.firstQuery;
+    //     } else if (this.fullSearchQuery === '') {
+    //       this.firstQuery = '';
+    //     }
+    //   } else {
+    //     this.firstQuery = (this.fullSearchQuery.slice(3, -1).split(',')[0] || this.firstQuery).trim();
+    //   }
+    // },
+    // updateSecondQuery() {
+    //   if (this.selectedRadio === 'radio1') {
+    //     if (this.fullSearchQuery.split(' ')[2]) {
+    //       this.secondQuery = this.fullSearchQuery.split(' ').pop() || this.scondQuery;
+    //     } else if (this.fullSearchQuery.split(' ').pop() === '') {
+    //       this.secondQuery = '';
+    //     }
+    //   } else {
+    //     this.secondQuery = (this.fullSearchQuery.slice(3, -1).split(',')[1] || this.secondQuery).trim();
+    //   }
+    // },
 
     async fetchSpellCheckQuery() {
       let query;
