@@ -160,6 +160,8 @@ export default {
         this.autocompleteResults = [];
         return;
       }
+      this.updateFirstQuery();
+      this.updateSecondQuery();
       this.fetchSpellCheckQuery();
       this.fetchAutocompleteResults();
 
@@ -215,28 +217,51 @@ export default {
       }
     },
     updateFullSearchQuery() {
-      if (!this.isAdvancedSearchActive) {
-        return;
-      }
       const isPhrase = (query) => /\b\w+\b\s+\b\w+\b/.test(query);
       const firstQueryFormatted = isPhrase(this.firstQuery) ? `"${this.firstQuery}"` : this.firstQuery;
       const secondQueryFormatted = isPhrase(this.secondQuery) ? `"${this.secondQuery}"` : this.secondQuery;
-
       if (this.selectedRadio === 'radio1') {
         this.fullSearchQuery = `${firstQueryFormatted} ${this.selectedOperator} ${secondQueryFormatted}`.trim();
       } else {
         this.fullSearchQuery = `#${this.proximityDistance}(${firstQueryFormatted}, ${secondQueryFormatted})`.trim();
       }
     },
+    updateFirstQuery() {
+      if (this.selectedRadio === 'radio1') {
+        this.firstQuery = this.fullSearchQuery.split(' ')[0] || this.firstQuery;
+      } else {
+        this.firstQuery = (this.fullSearchQuery.slice(3, -1).split(',')[0] || this.firstQuery).trim();
+      }
+    },
+    updateSecondQuery() {
+      if (this.selectedRadio === 'radio1') {
+        this.secondQuery = this.fullSearchQuery.split(' ')[2] || this.secondQuery;
+      } else {
+        this.secondQuery = (this.fullSearchQuery.slice(3, -1).split(',')[1] || this.secondQuery).trim();
+      }
+    },
+
     async fetchSpellCheckQuery() {
-      if (!this.fullSearchQuery) return;
+      let query;
+      switch (this.currentFocusedInput) {
+        case 'firstQuery':
+          query = this.firstQuery;
+          break;
+        case 'secondQuery':
+          query = this.secondQuery;
+          break;
+        case 'fullSearchQuery':
+        default:
+          query = this.fullSearchQuery;
+      }
+      if (!query) return;
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: this.fullSearchQuery,
+          query: query,
         }),
       };
       try {
@@ -249,9 +274,22 @@ export default {
         console.error('Spell check error:', error);
       }
     },
+
     async fetchAutocompleteResults() {
-      if (!this.fullSearchQuery) return;
-      const lastWord = this.fullSearchQuery.trim().split(' ').pop();
+      let query;
+      switch (this.currentFocusedInput) {
+        case 'firstQuery':
+          query = this.firstQuery;
+          break;
+        case 'secondQuery':
+          query = this.secondQuery;
+          break;
+        case 'fullSearchQuery':
+        default:
+          query = this.fullSearchQuery;
+      }
+      if (!query) return;
+      const lastWord = query.trim().split(' ').pop();
       const requestOptions = {
         method: 'POST',
         headers: {
@@ -271,6 +309,7 @@ export default {
         console.error('Autocomplete error:', error);
       }
     },
+
     updateQuery1(newQuery) {
       switch (this.currentFocusedInput) {
         case 'fullSearchQuery':
@@ -293,10 +332,10 @@ export default {
           this.fullSearchQuery = this.fullSearchQuery + " " + newQuery;
           break;
         case 'firstQuery':
-          this.fullSearchQuery = this.fullSearchQuery + " " + newQuery;
+          this.firstQuery = this.firstQuery + " " + newQuery;
           break;
         case 'secondQuery':
-          this.fullSearchQuery = this.fullSearchQuery + " " + newQuery;
+          this.secondQuery = this.secondQuery + " " + newQuery;
           break;
         default:
           console.log("No input field is currently focused.");
@@ -316,6 +355,8 @@ export default {
       this.isDropdownVisible = true;
     },
     updateDropdownPosition(event) {
+      this.spellCheckedQuery = '';
+      this.autocompleteResults = [];
       const inputElement = event.target;
       const autocompleteContainer = this.$refs.autocompleteContainer;
       const panelHeader = this.$refs.panelHeader;

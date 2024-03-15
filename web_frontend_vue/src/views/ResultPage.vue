@@ -2,7 +2,7 @@
     <div class="search-results-container" ref="searchResultsContainer">
         <div class="search-container-h3" ref="searchContainerH3">
             <h3 @click="goToHomePage" class="search-h3">APWikipedia</h3>
-            <SearchComponent @search-initiated="handleSearchInitiated" />
+            <SearchComponent />
         </div>
         <!-- <hr class="custom-hr" /> -->
         <div v-if="searchResults.length > 0" class="results-container">
@@ -57,6 +57,7 @@ export default {
             handler(query) {
                 this.isAdvancedSearchActive = query.advanced === '1';
                 this.searchQuery = query.q;
+                this.currentPage = 1;
                 this.searchStepTwo();
             },
         },
@@ -114,10 +115,6 @@ export default {
                 this.colorIndex++;
             }
             return this.tagColorCache[tag];
-        },
-        handleSearchInitiated(page) {
-            this.currentPage = page;
-            this.searchStepTwo();
         },
         adjustPaddingTop() {
             const searchContainer = this.$refs.searchContainerH3;
