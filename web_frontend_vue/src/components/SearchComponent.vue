@@ -279,7 +279,7 @@ export default {
         }),
       };
       try {
-        const response = await fetch(`http://34.142.98.9:5000/spell_check`, requestOptions);
+        const response = await fetch(`http:///34.89.81.212:5000/spell_check`, requestOptions);
         if (response.ok) {
           const result = await response.json();
           this.spellCheckedQuery = result.spell_checked_query;
@@ -314,7 +314,7 @@ export default {
         }),
       };
       try {
-        const response = await fetch(`http://34.142.98.9:5000/word_expansion`, requestOptions);
+        const response = await fetch(`http:///34.89.81.212:5000/word_expansion`, requestOptions);
         if (response.ok) {
           const result2 = await response.json();
           this.autocompleteResults = result2.expanded_words;
