@@ -155,42 +155,7 @@ export default {
     },
 
     fullSearchQuery(newVal) {
-
-      // this.updateFirstQuery();
-      // this.updateSecondQuery();
-
-      if (!this.fullSearchQuery) {
-        this.spellCheckedQuery = '';
-        this.autocompleteResults = [];
-        return;
-      }
-
-      this.fetchSpellCheckQuery();
-      this.fetchAutocompleteResults();
-
-      if (!this.isAdvancedSearchActive)
-        return;
-
-      const operatorRegex = /(AND|OR|AND NOT|OR NOT)/;
-      const proximityRegex = /#(\d+)\(([^,]+), ([^)]+)\)/;
-
-      if (operatorRegex.test(newVal)) {
-        const parts = newVal.split(operatorRegex).map(part => part.trim());
-        if (parts.length === 3) {
-          this.firstQuery = parts[0].replace(/^"|"$/g, '');
-          this.selectedOperator = parts[1];
-          this.secondQuery = parts[2].replace(/^"|"$/g, '');
-          this.selectedRadio = 'radio1';
-        }
-      } else if (proximityRegex.test(newVal)) {
-        const matches = newVal.match(proximityRegex);
-        if (matches && matches.length === 4) {
-          this.proximityDistance = matches[1];
-          this.firstQuery = matches[2].replace(/^"|"$/g, '');
-          this.secondQuery = matches[3].replace(/^"|"$/g, '');
-          this.selectedRadio = 'radio2';
-        }
-      }
+      this.updateFirstSecondQuery(newVal);
     },
   },
   methods: {
@@ -232,29 +197,36 @@ export default {
         this.fullSearchQuery = `#${this.proximityDistance}(${firstQueryFormatted}, ${secondQueryFormatted})`.trim();
       }
     },
-    // updateFirstQuery() {
-    //   if (this.selectedRadio === 'radio1') {
-    //     if (this.fullSearchQuery) {
-    //       this.firstQuery = this.fullSearchQuery.split(' ')[0] || this.firstQuery;
-    //     } else if (this.fullSearchQuery === '') {
-    //       this.firstQuery = '';
-    //     }
-    //   } else {
-    //     this.firstQuery = (this.fullSearchQuery.slice(3, -1).split(',')[0] || this.firstQuery).trim();
-    //   }
-    // },
-    // updateSecondQuery() {
-    //   if (this.selectedRadio === 'radio1') {
-    //     if (this.fullSearchQuery.split(' ')[2]) {
-    //       this.secondQuery = this.fullSearchQuery.split(' ').pop() || this.scondQuery;
-    //     } else if (this.fullSearchQuery.split(' ').pop() === '') {
-    //       this.secondQuery = '';
-    //     }
-    //   } else {
-    //     this.secondQuery = (this.fullSearchQuery.slice(3, -1).split(',')[1] || this.secondQuery).trim();
-    //   }
-    // },
-
+    updateFirstSecondQuery(newVal) {
+      if (!this.fullSearchQuery) {
+        this.spellCheckedQuery = '';
+        this.autocompleteResults = [];
+        return;
+      }
+      this.fetchSpellCheckQuery();
+      this.fetchAutocompleteResults();
+      if (!this.isAdvancedSearchActive)
+        return;
+      const operatorRegex = /(AND NOT|OR NOT|AND|OR)/;
+      const proximityRegex = /#(\d+)\(([^,]*), ([^)]*)\)/;
+      if (operatorRegex.test(newVal)) {
+        const parts = newVal.split(operatorRegex).map(part => part.trim());
+        if (parts.length === 3) {
+          this.firstQuery = parts[0].replace(/^"|"$/g, '');
+          this.selectedOperator = parts[1];
+          this.secondQuery = parts[2].replace(/^"|"$/g, '');
+          this.selectedRadio = 'radio1';
+        }
+      } else if (proximityRegex.test(newVal)) {
+        const matches = newVal.match(proximityRegex);
+        if (matches && matches.length === 4) {
+          this.proximityDistance = matches[1];
+          this.firstQuery = matches[2].replace(/^"|"$/g, '');
+          this.secondQuery = matches[3].replace(/^"|"$/g, '');
+          this.selectedRadio = 'radio2';
+        }
+      }
+    },
     async fetchSpellCheckQuery() {
       let query;
       switch (this.currentFocusedInput) {
@@ -288,7 +260,6 @@ export default {
         console.error('Spell check error:', error);
       }
     },
-
     async fetchAutocompleteResults() {
       let query;
       switch (this.currentFocusedInput) {
@@ -323,7 +294,6 @@ export default {
         console.error('Autocomplete error:', error);
       }
     },
-
     updateQuery1(newQuery) {
       switch (this.currentFocusedInput) {
         case 'fullSearchQuery':
