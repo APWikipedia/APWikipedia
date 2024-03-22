@@ -154,9 +154,41 @@ export default {
       this.updateFullSearchQuery();
     },
 
-    fullSearchQuery(newVal) {
-      this.updateFirstSecondQuery(newVal);
-    },
+    // fullSearchQuery(newVal) {
+
+    //   if (!this.fullSearchQuery) {
+    //     this.spellCheckedQuery = '';
+    //     this.autocompleteResults = [];
+    //     return;
+    //   }
+
+    //   this.fetchSpellCheckQuery();
+    //   this.fetchAutocompleteResults();
+
+    //   if (!this.isAdvancedSearchActive)
+    //     return;
+
+    //   const operatorRegex = /(AND|OR|AND NOT|OR NOT)/;
+    //   const proximityRegex = /#(\d+)\(([^,]+), ([^)]+)\)/;
+
+    //   if (operatorRegex.test(newVal)) {
+    //     const parts = newVal.split(operatorRegex).map(part => part.trim());
+    //     if (parts.length === 3) {
+    //       this.firstQuery = parts[0].replace(/^"|"$/g, '');
+    //       this.selectedOperator = parts[1];
+    //       this.secondQuery = parts[2].replace(/^"|"$/g, '');
+    //       this.selectedRadio = 'radio1';
+    //     }
+    //   } else if (proximityRegex.test(newVal)) {
+    //     const matches = newVal.match(proximityRegex);
+    //     if (matches && matches.length === 4) {
+    //       this.proximityDistance = matches[1];
+    //       this.firstQuery = matches[2].replace(/^"|"$/g, '');
+    //       this.secondQuery = matches[3].replace(/^"|"$/g, '');
+    //       this.selectedRadio = 'radio2';
+    //     }
+    //   }
+    // },
   },
   methods: {
     searchStepOne() {
@@ -195,36 +227,6 @@ export default {
         this.fullSearchQuery = `${firstQueryFormatted} ${this.selectedOperator} ${secondQueryFormatted}`.trim();
       } else {
         this.fullSearchQuery = `#${this.proximityDistance}(${firstQueryFormatted}, ${secondQueryFormatted})`.trim();
-      }
-    },
-    updateFirstSecondQuery(newVal) {
-      if (!this.fullSearchQuery) {
-        this.spellCheckedQuery = '';
-        this.autocompleteResults = [];
-        return;
-      }
-      this.fetchSpellCheckQuery();
-      this.fetchAutocompleteResults();
-      if (!this.isAdvancedSearchActive)
-        return;
-      const operatorRegex = /(AND NOT|OR NOT|AND|OR)/;
-      const proximityRegex = /#(\d+)\(([^,]*), ([^)]*)\)/;
-      if (operatorRegex.test(newVal)) {
-        const parts = newVal.split(operatorRegex).map(part => part.trim());
-        if (parts.length === 3) {
-          this.firstQuery = parts[0].replace(/^"|"$/g, '');
-          this.selectedOperator = parts[1];
-          this.secondQuery = parts[2].replace(/^"|"$/g, '');
-          this.selectedRadio = 'radio1';
-        }
-      } else if (proximityRegex.test(newVal)) {
-        const matches = newVal.match(proximityRegex);
-        if (matches && matches.length === 4) {
-          this.proximityDistance = matches[1];
-          this.firstQuery = matches[2].replace(/^"|"$/g, '');
-          this.secondQuery = matches[3].replace(/^"|"$/g, '');
-          this.selectedRadio = 'radio2';
-        }
       }
     },
     async fetchSpellCheckQuery() {
