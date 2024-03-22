@@ -154,9 +154,9 @@ export default {
       this.updateFullSearchQuery();
     },
 
-    fullSearchQuery(newVal) {
-      this.updateFirstSecondQuery(newVal);
-    },
+    // fullSearchQuery(newVal) {
+    //   this.updateFirstSecondQuery(newVal);
+    // },
   },
   methods: {
     searchStepOne() {
