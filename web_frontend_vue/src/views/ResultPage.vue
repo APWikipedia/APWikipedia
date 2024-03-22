@@ -48,7 +48,7 @@ export default {
     },
     computed: {
         searchURL() {
-            return this.isAdvancedSearchActive ? 'http://34.142.98.9:5000/search' : 'http://34.142.98.9:5000/ranked_search';
+            return this.isAdvancedSearchActive ? 'http:///34.89.81.212:5000/search' : 'http:///34.89.81.212:5000/ranked_search';
         },
     },
     watch: {

@@ -155,7 +155,39 @@ export default {
     },
 
     // fullSearchQuery(newVal) {
-    //   this.updateFirstSecondQuery(newVal);
+
+    //   if (!this.fullSearchQuery) {
+    //     this.spellCheckedQuery = '';
+    //     this.autocompleteResults = [];
+    //     return;
+    //   }
+
+    //   this.fetchSpellCheckQuery();
+    //   this.fetchAutocompleteResults();
+
+    //   if (!this.isAdvancedSearchActive)
+    //     return;
+
+    //   const operatorRegex = /(AND|OR|AND NOT|OR NOT)/;
+    //   const proximityRegex = /#(\d+)\(([^,]+), ([^)]+)\)/;
+
+    //   if (operatorRegex.test(newVal)) {
+    //     const parts = newVal.split(operatorRegex).map(part => part.trim());
+    //     if (parts.length === 3) {
+    //       this.firstQuery = parts[0].replace(/^"|"$/g, '');
+    //       this.selectedOperator = parts[1];
+    //       this.secondQuery = parts[2].replace(/^"|"$/g, '');
+    //       this.selectedRadio = 'radio1';
+    //     }
+    //   } else if (proximityRegex.test(newVal)) {
+    //     const matches = newVal.match(proximityRegex);
+    //     if (matches && matches.length === 4) {
+    //       this.proximityDistance = matches[1];
+    //       this.firstQuery = matches[2].replace(/^"|"$/g, '');
+    //       this.secondQuery = matches[3].replace(/^"|"$/g, '');
+    //       this.selectedRadio = 'radio2';
+    //     }
+    //   }
     // },
   },
   methods: {
@@ -197,36 +229,6 @@ export default {
         this.fullSearchQuery = `#${this.proximityDistance}(${firstQueryFormatted}, ${secondQueryFormatted})`.trim();
       }
     },
-    updateFirstSecondQuery(newVal) {
-      if (!this.fullSearchQuery) {
-        this.spellCheckedQuery = '';
-        this.autocompleteResults = [];
-        return;
-      }
-      this.fetchSpellCheckQuery();
-      this.fetchAutocompleteResults();
-      if (!this.isAdvancedSearchActive)
-        return;
-      const operatorRegex = /(AND NOT|OR NOT|AND|OR)/;
-      const proximityRegex = /#(\d+)\(([^,]*), ([^)]*)\)/;
-      if (operatorRegex.test(newVal)) {
-        const parts = newVal.split(operatorRegex).map(part => part.trim());
-        if (parts.length === 3) {
-          this.firstQuery = parts[0].replace(/^"|"$/g, '');
-          this.selectedOperator = parts[1];
-          this.secondQuery = parts[2].replace(/^"|"$/g, '');
-          this.selectedRadio = 'radio1';
-        }
-      } else if (proximityRegex.test(newVal)) {
-        const matches = newVal.match(proximityRegex);
-        if (matches && matches.length === 4) {
-          this.proximityDistance = matches[1];
-          this.firstQuery = matches[2].replace(/^"|"$/g, '');
-          this.secondQuery = matches[3].replace(/^"|"$/g, '');
-          this.selectedRadio = 'radio2';
-        }
-      }
-    },
     async fetchSpellCheckQuery() {
       let query;
       switch (this.currentFocusedInput) {
@@ -251,7 +253,7 @@ export default {
         }),
       };
       try {
-        const response = await fetch(`http://34.142.98.9:5000/spell_check`, requestOptions);
+        const response = await fetch(`http:///34.89.81.212:5000/spell_check`, requestOptions);
         if (response.ok) {
           const result = await response.json();
           this.spellCheckedQuery = result.spell_checked_query;
@@ -285,7 +287,7 @@ export default {
         }),
       };
       try {
-        const response = await fetch(`http://34.142.98.9:5000/word_expansion`, requestOptions);
+        const response = await fetch(`http:///34.89.81.212:5000/word_expansion`, requestOptions);
         if (response.ok) {
           const result2 = await response.json();
           this.autocompleteResults = result2.expanded_words;
